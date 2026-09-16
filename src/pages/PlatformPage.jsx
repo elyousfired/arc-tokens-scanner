@@ -5,7 +5,7 @@ import { fmtCompact, fmtNum } from "../lib/format";
 
 export function PlatformPage({ token }) {
   const symbol = token?.symbol || "ARGUS";
-  const totalVol = token?.volume24h || 18420000;
+  const totalVol = token?.volume24h ?? 0;
   const dailyFees = (totalVol * (token?.feeRatePct || 1.0)) / 100;
   const burnPct = (token?.feeDistribution?.burnPct || 50) / 100;
 

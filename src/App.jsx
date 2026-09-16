@@ -21,7 +21,7 @@ import { AllTokensHub } from "./pages/AllTokensHub";
 export default function App() {
   const [tokens, setTokens] = useState(() => {
     try {
-      const saved = localStorage.getItem("arc_scanner_tokens_v5");
+      const saved = localStorage.getItem("arc_scanner_tokens_v6");
       return saved ? JSON.parse(saved) : INITIAL_TOKENS;
     } catch {
       return INITIAL_TOKENS;
@@ -38,7 +38,7 @@ export default function App() {
   // Save tokens to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem("arc_scanner_tokens_v5", JSON.stringify(tokens));
+      localStorage.setItem("arc_scanner_tokens_v6", JSON.stringify(tokens));
     } catch {}
   }, [tokens]);
 

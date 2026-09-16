@@ -5,12 +5,12 @@ import { fmtNum, fmtCompact } from "../lib/format";
 export function FlywheelSimulator({ token, price, supply, volume24h }) {
   const [growthPerDay, setGrowthPerDay] = useState(10);
   const [horizonDays, setHorizonDays] = useState(7);
-  const [poolDepth, setPoolDepth] = useState(token?.liquidity || 3250000);
+  const [poolDepth, setPoolDepth] = useState(token?.liquidity || 500000);
 
   const symbol = token?.symbol || "ARGUS";
   const baseP = price || token?.basePrice || 0;
-  const currentSupply = supply || token?.currentSupply || 934250000;
-  const vol = volume24h || token?.volume24h || 18420000;
+  const currentSupply = supply || token?.currentSupply || (token?.initialSupply || 1000000000);
+  const vol = volume24h ?? token?.volume24h ?? 0;
 
   const sim = useMemo(() => {
     const dailyBaseRev = vol * (token?.feeRatePct ? token.feeRatePct / 100 : 0.01);

@@ -20,6 +20,8 @@ export async function fetchLiveTokenData(contractAddress) {
       priceUsd,
       marketCap,
       txns24h,
+      symbol: topPair.baseToken?.symbol || '',
+      name: topPair.baseToken?.name || '',
       topPairUrl: topPair.url,
       volume24h: totalVolume24h,
       liquidity: totalLiquidity,

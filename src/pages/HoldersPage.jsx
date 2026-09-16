@@ -4,8 +4,8 @@ import { fmtCompact, fmtNum } from "../lib/format";
 
 export function HoldersPage({ token }) {
   const symbol = token?.symbol || "ARGUS";
-  const currentSupply = token?.currentSupply || 934250000;
-  const burned = token?.totalBurned || 65750000;
+  const currentSupply = token?.currentSupply || (token?.initialSupply || 1000000000);
+  const burned = token?.totalBurned ?? 0;
   const price = token?.basePrice || 0;
 
   const topWallets = [
@@ -112,7 +112,7 @@ export function HoldersPage({ token }) {
               <th className="pb-3 text-right font-medium">Balance</th>
               <th className="pb-3 text-right font-medium">Supply Share</th>
               <th className="pb-3 text-right font-medium">Value (USDC)</th>
-              <th className="pb-3 text-right font-medium">Arcscan</th>
+              <th className="pb-3 text-right font-medium">Explorer</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/50">

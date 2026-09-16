@@ -93,7 +93,7 @@ export function TokensPage({ token, allTokens, onSelectToken }) {
           </thead>
           <tbody className="divide-y divide-slate-800/50">
             {filteredTokens.map((t, idx) => {
-              const burnedPct = (t.totalBurned / t.initialSupply) * 100;
+              const burnedPct = t.totalBurned && t.initialSupply ? (t.totalBurned / t.initialSupply) * 100 : 0;
               const chg = t.priceChanges?.h24 ? parseFloat(t.priceChanges.h24) : 0;
               return (
                 <tr key={t.id} className="hover:bg-slate-800/30 transition">
@@ -147,7 +147,7 @@ export function TokensPage({ token, allTokens, onSelectToken }) {
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 px-2 py-1 rounded transition"
                     >
-                      Arcscan <ExternalLink className="w-3 h-3" />
+                      Explorer <ExternalLink className="w-3 h-3" />
                     </a>
                   </td>
                 </tr>

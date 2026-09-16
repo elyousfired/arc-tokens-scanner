@@ -13,7 +13,7 @@ export function DailyBuybacksChart({
   const symbol = token?.symbol || "ARGUS";
   const color = token?.color || "#38bdf8";
   const price = currentPrice || token?.basePrice || 0;
-  const targetBurned = totalBurnedTokens || token?.totalBurned || 65750000;
+  const targetBurned = totalBurnedTokens != null ? totalBurnedTokens : (token?.totalBurned ?? 0);
 
   // Generate dynamic calendar days based on current Date (UTC)
   const chartData = React.useMemo(() => {
@@ -40,8 +40,8 @@ export function DailyBuybacksChart({
     });
 
     const pastTokens = completedPastDays.reduce((sum, d) => sum + d.burnedTokens, 0);
-    const todayTokens = Math.max(50000, targetBurned - pastTokens);
-    const todayUsd = Math.round(todayTokens * price) || Math.round(dailyBuybackPressure || 92100);
+    const todayTokens = targetBurned > 0 ? Math.max(0, targetBurned - pastTokens) : 0;
+    const todayUsd = Math.round(todayTokens * price) || Math.round(dailyBuybackPressure || 0);
 
     const result = completedPastDays.map((d) => {
       const targetDate = new Date(now.getTime() - d.offsetDays * 24 * 60 * 60 * 1000);
@@ -72,7 +72,7 @@ export function DailyBuybacksChart({
   const todayItem = chartData.find((d) => d.date?.includes("Today")) || chartData[chartData.length - 1];
   const displayTotalTokens = targetBurned;
   const displayTotalUsd = totalBurnedUsd || Math.round(targetBurned * price);
-  const displayTodayUsd = todayItem?.buybackUsd || (dailyBuybackPressure || 92100);
+  const displayTodayUsd = todayItem?.buybackUsd || (dailyBuybackPressure || 0);
 
   return (
     <section className="card p-5 flex flex-col justify-between border-slate-800 bg-[#111622]">

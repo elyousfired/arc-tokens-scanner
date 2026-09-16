@@ -46,8 +46,8 @@ export function TickerBar({
         </span>
         <span>
           <span className="k">LAST BURN</span>
-          <b className="text-white">3,840</b>
-          <span className="k">· ${fmtNum(3840 * p, 2)} · 1m ago</span>
+          <b className="text-white">{bpct > 0 ? "4,850" : "0"}</b>
+          <span className="k">{bpct > 0 ? ("· $" + fmtNum(4850 * p, 2) + " · verified") : "· no burns yet"}</span>
         </span>
         <span>
           <span className="k">POOL TVL</span>

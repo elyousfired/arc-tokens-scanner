@@ -10,8 +10,8 @@ import { TradingPairsTable } from "../components/TradingPairsTable";
 export function OverviewPage({ token, onNavigate }) {
   const price = token?.basePrice || 0;
   const priceChange = token?.priceChanges?.h24 ? parseFloat(token.priceChanges.h24) : 0;
-  const supply = token?.currentSupply || 934250000;
-  const burned = token?.totalBurned || 65750000;
+  const supply = token?.currentSupply || (token?.initialSupply || 1000000000);
+  const burned = token?.totalBurned ?? 0;
   const burnedPct = (burned / (token?.initialSupply || 1000000000)) * 100;
   const burnedUsd = burned * price;
   const vol24h = token?.volume24h || 0;

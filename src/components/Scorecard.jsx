@@ -48,9 +48,9 @@ export function Scorecard({
             <span className="badge-bull">Bullish</span>
           </div>
           <div className="text-xl font-bold font-mono text-white mt-2">
-            {fmtNum(burnVelocity || 0.28, 2)}% / day
+            {fmtNum(burnVelocity || 0, 2)}% / day
           </div>
-          <div className="text-[10px] text-slate-500 mt-1">~{fmtCompact(dailyBuybackPressure / (token?.basePrice || 0.05), "")} {symbol} burned daily</div>
+          <div className="text-[10px] text-slate-500 mt-1">{(token?.basePrice > 0 ? fmtCompact(dailyBuybackPressure / token.basePrice, "") : "0")} {symbol} burned daily</div>
         </div>
 
         <div className="indicator-card">
@@ -59,7 +59,7 @@ export function Scorecard({
             <span className="badge-bull">Bullish</span>
           </div>
           <div className="text-xl font-bold font-mono text-white mt-2">
-            {fmtCompact(dailyBuybackPressure || 92100)} / day
+            {fmtCompact(dailyBuybackPressure || 0)} / day
           </div>
           <div className="text-[10px] text-slate-500 mt-1">{token?.feeDistribution?.burnPct || 50}% of AMM fee revenue</div>
         </div>
@@ -70,9 +70,9 @@ export function Scorecard({
             <span className="badge-bull">Bullish</span>
           </div>
           <div className="text-xl font-bold font-mono text-white mt-2">
-            {fmtCompact(dailyFeesGenerated || 184200)} / day
+            {fmtCompact(dailyFeesGenerated || 0)} / day
           </div>
-          <div className="text-[10px] text-slate-500 mt-1">${fmtCompact((dailyFeesGenerated || 184200) * 365)} annualized</div>
+          <div className="text-[10px] text-slate-500 mt-1">${fmtCompact((dailyFeesGenerated || 0) * 365)} annualized</div>
         </div>
 
         <div className="indicator-card">
@@ -80,7 +80,7 @@ export function Scorecard({
             <span className="text-[11px] font-semibold text-slate-400 uppercase">Ecosystem volume</span>
             <span className="badge-bull">Bullish</span>
           </div>
-          <div className="text-xl font-bold font-mono text-white mt-2">{fmtCompact(token?.volume24h || 18420000)}</div>
+          <div className="text-xl font-bold font-mono text-white mt-2">{fmtCompact(token?.volume24h || 0)}</div>
           <div className="text-[10px] text-slate-500 mt-1">{token?.directPairs?.length || 3} verified AMM liquidity pools</div>
         </div>
 
@@ -89,7 +89,7 @@ export function Scorecard({
             <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Pool Depth</span>
             <span className="badge-neutral">Neutral</span>
           </div>
-          <div className="text-xl font-bold font-mono text-white mt-2">{fmtCompact(liquidity || token?.liquidity || 3250000)}</div>
+          <div className="text-xl font-bold font-mono text-white mt-2">{fmtCompact(liquidity || token?.liquidity || 0)}</div>
           <div className="text-[10px] text-slate-500 mt-1">Arc AMM & Launchpad Pools</div>
         </div>
 

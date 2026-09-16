@@ -6,7 +6,7 @@ import { TradingPairsTable } from "../components/TradingPairsTable";
 
 export function PairsPage({ token }) {
   const symbol = token?.symbol || "ARGUS";
-  const totalVol = token?.volume24h || 18420000;
+  const totalVol = token?.volume24h ?? 0;
 
   const categoryData = [
     { name: "USDC Native", volume: totalVol * 0.70, fill: "#00f2fe" },

@@ -38,37 +38,45 @@ export function TradingPairsTable({ token, pairs = [] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/50">
-            {displayPairs.map((p, idx) => (
-              <tr key={idx} className="hover:bg-slate-800/30 transition">
-                <td className="py-3 text-slate-500">{String(idx + 1).padStart(2, "0")}</td>
-                <td className="py-3">
-                  <span className="font-bold text-white text-sm">{p.pair}</span>
-                </td>
-                <td className="py-3 text-slate-400">{p.dex}</td>
-                <td className="py-3 text-right text-slate-200">
-                  ${fmtNum(token?.basePrice || 0, 4)}
-                </td>
-                <td className="py-3 text-right font-semibold text-white">
-                  {fmtCompact(p.volume24h)}
-                </td>
-                <td className="py-3 text-right text-green-400">
-                  ${fmtNum(p.fees, 0)}
-                </td>
-                <td className="py-3 text-right text-slate-400">
-                  {fmtCompact(p.liquidity)}
-                </td>
-                <td className="py-3 text-right">
-                  <a
-                    href={p.url || `https://arc.etherscan.io/token/${token?.contract || ""}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-cyan-400 hover:underline text-[11px]"
-                  >
-                    {p.url ? "DexPool" : "Arcscan"} <ExternalLink className="w-3 h-3" />
-                  </a>
+            {displayPairs.length === 0 ? (
+              <tr>
+                <td colSpan="8" className="py-8 text-center text-slate-500 font-mono">
+                  No public DEX liquidity pools registered on Arc L1 yet for {symbol}.
                 </td>
               </tr>
-            ))}
+            ) : (
+              displayPairs.map((p, idx) => (
+                <tr key={idx} className="hover:bg-slate-800/30 transition">
+                  <td className="py-3 text-slate-500">{String(idx + 1).padStart(2, "0")}</td>
+                  <td className="py-3">
+                    <span className="font-bold text-white text-sm">{p.pair}</span>
+                  </td>
+                  <td className="py-3 text-slate-400">{p.dex}</td>
+                  <td className="py-3 text-right text-slate-200">
+                    {"$" + fmtNum(token?.basePrice || 0, 4)}
+                  </td>
+                  <td className="py-3 text-right font-semibold text-white">
+                    {fmtCompact(p.volume24h)}
+                  </td>
+                  <td className="py-3 text-right text-green-400">
+                    {"$" + fmtNum(p.fees, 0)}
+                  </td>
+                  <td className="py-3 text-right text-slate-400">
+                    {fmtCompact(p.liquidity)}
+                  </td>
+                  <td className="py-3 text-right">
+                    <a
+                      href={p.url || ("https://arc.etherscan.io/token/" + (token?.contract || ""))}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-cyan-400 hover:underline text-[11px]"
+                    >
+                      {p.url ? "DexPool" : "Explorer"} <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

@@ -7,7 +7,7 @@ export function RewardsPage({ token }) {
   const [holdingAmount, setHoldingAmount] = useState(25000);
   const symbol = token?.symbol || "ARGUS";
   const price = token?.basePrice || 0;
-  const currentSupply = token?.currentSupply || 934250000;
+  const currentSupply = token?.currentSupply || (token?.initialSupply || 1000000000);
   const totalVol = token?.volume24h || 0;
   const dailyFees = (totalVol * (token?.feeRatePct || 1.0)) / 100;
   const holdersSharePct = (token?.feeDistribution?.holdersPct || 25) / 100;

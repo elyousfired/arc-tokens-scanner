@@ -87,7 +87,7 @@ export function SupplyDonut({
           </dd>
           <dt className="text-slate-400">Burn events recorded</dt>
           <dd className="font-mono text-right font-medium text-slate-200">
-            {fmtCompact(token?.burnWalletTxs || 184520, "")}+ · 1 tx / {token?.burnWalletTxRateSec || 2.5}s
+            {token?.burnWalletTxs ? (fmtCompact(token.burnWalletTxs, "") + "+ · 1 tx / " + (token?.burnWalletTxRateSec || 2.5) + "s") : "On-chain Arc L1 Dead Contract"}
           </dd>
         </dl>
 

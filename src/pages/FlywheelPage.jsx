@@ -8,8 +8,8 @@ import { fmtCompact } from "../lib/format";
 export function FlywheelPage({ token }) {
   const symbol = token?.symbol || "ARGUS";
   const price = token?.basePrice || 0;
-  const supply = token?.currentSupply || 934250000;
-  const burned = token?.totalBurned || 65750000;
+  const supply = token?.currentSupply || (token?.initialSupply || 1000000000);
+  const burned = token?.totalBurned ?? 0;
   const burnedUsd = burned * price;
   const totalVol = token?.volume24h || 0;
   const dailyFees = (totalVol * (token?.feeRatePct || 1.0)) / 100;
