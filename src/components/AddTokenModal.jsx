@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Plus, AlertCircle, Loader2, CheckCircle2 } from "lucide-react";
-import { fetchLiveTokenData } from "../services/dexService";
+import { fetchLiveTokenData, fetchOnchainBurnData } from "../services/dexService";
 import { fmtCompact, fmtNum } from "../lib/format";
 
 export function AddTokenModal({ isOpen, onClose, onAddToken }) {
@@ -35,8 +35,14 @@ export function AddTokenModal({ isOpen, onClose, onAddToken }) {
     if (clean.startsWith("0x") && clean.length === 42) {
       try {
         setIsFetching(true);
-        const live = await fetchLiveTokenData(clean.toLowerCase());
-        if (live && (live.priceUsd || live.volume24h || (live.directPairs && live.directPairs.length > 0))) {
+        let [live, onchain] = await Promise.all([
+          fetchLiveTokenData(clean.toLowerCase()),
+          fetchOnchainBurnData(clean.toLowerCase())
+        ]);
+        if (onchain && onchain.totalBurned > 0) {
+          live = live ? { ...live, totalBurned: onchain.totalBurned } : { totalBurned: onchain.totalBurned };
+        }
+        if (live && (live.priceUsd || live.volume24h || live.totalBurned || (live.directPairs && live.directPairs.length > 0))) {
           setLiveInfo(live);
           if (live.symbol) setSymbol(live.symbol);
           if (live.name) setName(live.name);
@@ -86,7 +92,7 @@ export function AddTokenModal({ isOpen, onClose, onAddToken }) {
       basePrice: p,
       initialSupply: supply,
       currentSupply: supply,
-      totalBurned: 0,
+      totalBurned: liveInfo?.totalBurned || 0,
       pendingBurn: 0,
       burnWallet: "0x000000000000000000000000000000000000dEaD",
       burnWalletTxs: 0,

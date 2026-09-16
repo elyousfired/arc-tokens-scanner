@@ -5,7 +5,7 @@ import { TickerBar } from "./components/TickerBar";
 import { Footer } from "./components/Footer";
 import { AddTokenModal } from "./components/AddTokenModal";
 import { SwapModal } from "./components/SwapModal";
-import { fetchLiveTokenData } from "./services/dexService";
+import { fetchLiveTokenData, fetchOnchainBurnData } from "./services/dexService";
 
 import { OverviewPage } from "./pages/OverviewPage";
 import { FlywheelPage } from "./pages/FlywheelPage";
@@ -42,20 +42,28 @@ export default function App() {
     } catch {}
   }, [tokens]);
 
-  // Sync real-time DexScreener prices
+  // Sync real-time DexScreener prices & Arc L1 On-Chain Dead Burn Wallet
   const syncLivePrices = async () => {
     try {
       setLoading(true);
       const updatedTokens = await Promise.all(
         tokens.map(async (t) => {
           if (!t.contract) return t;
-          const live = await fetchLiveTokenData(t.contract);
-          if (!live || !live.priceUsd) return t;
 
-          const newPrice = live.priceUsd;
-          const newVol = live.volume24h || t.volume24h;
-          const newLiq = live.liquidity || t.liquidity;
-          const newMc = live.marketCap || Math.round(t.currentSupply * newPrice);
+          // 1. Fetch live DEX metrics from DexScreener
+          const live = await fetchLiveTokenData(t.contract);
+
+          // 2. Fetch real-time on-chain dead burn wallet balance from Arc L1 RPC node!
+          const onchain = await fetchOnchainBurnData(t.contract, t.burnWallet);
+
+          const newPrice = live?.priceUsd || t.basePrice;
+          const newVol = live?.volume24h != null ? live.volume24h : t.volume24h;
+          const newLiq = live?.liquidity != null ? live.liquidity : t.liquidity;
+
+          const burned = onchain?.totalBurned != null ? onchain.totalBurned : t.totalBurned;
+          const initialSupply = onchain?.initialSupply || t.initialSupply || 1000000000;
+          const currentSupply = onchain?.currentSupply != null ? onchain.currentSupply : Math.max(0, initialSupply - burned);
+          const newMc = live?.marketCap || Math.round(currentSupply * newPrice);
 
           return {
             ...t,
@@ -63,9 +71,12 @@ export default function App() {
             volume24h: newVol,
             liquidity: newLiq,
             marketCap: newMc,
-            topPairUrl: live.topPairUrl || t.topPairUrl,
-            priceChanges: live.priceChanges || t.priceChanges,
-            directPairs: live.directPairs && live.directPairs.length > 0 ? live.directPairs : t.directPairs,
+            totalBurned: burned,
+            currentSupply,
+            initialSupply,
+            topPairUrl: live?.topPairUrl || t.topPairUrl,
+            priceChanges: live?.priceChanges || t.priceChanges,
+            directPairs: live?.directPairs && live.directPairs.length > 0 ? live.directPairs : t.directPairs,
           };
         })
       );
@@ -73,7 +84,7 @@ export default function App() {
       setTokens(updatedTokens);
       setSecondsAgo(0);
     } catch (e) {
-      console.error("Live price sync failed:", e);
+      console.error("Live price & onchain burn sync failed:", e);
     } finally {
       setLoading(false);
     }
