@@ -5,7 +5,7 @@ import { PriceCandleChart } from "../components/PriceCandleChart";
 import { DailyBuybacksChart } from "../components/DailyBuybacksChart";
 import { RecentBurnsTable } from "../components/RecentBurnsTable";
 import { FlywheelSimulator } from "../components/FlywheelSimulator";
-import { EcosystemTable } from "../components/EcosystemTable";
+import { TradingPairsTable } from "../components/TradingPairsTable";
 
 export function OverviewPage({ token, onNavigate }) {
   const price = token?.basePrice || 0.0482;
@@ -72,11 +72,8 @@ export function OverviewPage({ token, onNavigate }) {
         volume24h={vol24h}
       />
 
-      {/* 6. Ecosystem Pairs Table */}
-      <EcosystemTable
-        token={token}
-        ecosystemPairs={token?.ecosystemPairs || []}
-      />
+      {/* 6. Official Trading Pools Table */}
+      <TradingPairsTable token={token} />
     </div>
   );
 }

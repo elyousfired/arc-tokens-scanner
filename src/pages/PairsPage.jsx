@@ -9,10 +9,9 @@ export function PairsPage({ token }) {
   const totalVol = token?.volume24h || 18420000;
 
   const categoryData = [
-    { name: "USDC Native", volume: totalVol * 0.65, fill: "#00f2fe" },
-    { name: "Direct AMM", volume: totalVol * 0.20, fill: "#38bdf8" },
+    { name: "USDC Native", volume: totalVol * 0.70, fill: "#00f2fe" },
+    { name: "Cross AMM", volume: totalVol * 0.20, fill: "#38bdf8" },
     { name: "Bridge (WETH)", volume: totalVol * 0.10, fill: "#818cf8" },
-    { name: "Ecosystem Pairs", volume: totalVol * 0.05, fill: "#c084fc" },
   ];
 
   return (

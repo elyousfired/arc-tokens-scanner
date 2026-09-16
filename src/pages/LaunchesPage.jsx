@@ -51,28 +51,6 @@ export function LaunchesPage({ token }) {
       creator: "0x86f7...222e",
       dexTarget: "Ellipsis Curve AMM",
     },
-    {
-      name: "Arc Alpha Meme",
-      symbol: "ALPHA",
-      createdAgo: "15m ago",
-      bondingProgress: 64,
-      graduated: false,
-      mcap: 85000,
-      volume24h: 340000,
-      creator: "0x91fa...41ab",
-      dexTarget: "Arc Launch Bonding Curve",
-    },
-    {
-      name: "Subsecond Speed",
-      symbol: "SPEED",
-      createdAgo: "38m ago",
-      bondingProgress: 45,
-      graduated: false,
-      mcap: 42000,
-      volume24h: 180000,
-      creator: "0x44cd...99bb",
-      dexTarget: "Arc Launch Bonding Curve",
-    },
   ];
 
   const filtered = launches.filter((l) => {

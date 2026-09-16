@@ -39,11 +39,6 @@ export const INITIAL_TOKENS = [
       { pair: 'ARGUS/USDC', dex: 'ArgusSwap Main Pool', volume24h: 12450000, fees: 62250, liquidity: 2100000 },
       { pair: 'ARGUS/WETH', dex: 'Arc Uniswap v3', volume24h: 3820000, fees: 19100, liquidity: 750000 },
       { pair: 'ARGUS/TOLLY', dex: 'Tolly Dual Pool', volume24h: 2150000, fees: 10750, liquidity: 400000 }
-    ],
-    ecosystemPairs: [
-      { symbol: 'APUMP', name: 'AstraPump Meme', priceUsd: 0.0038, marketCap: 3800000, volume24h: 1650000, liquidity: 140000 },
-      { symbol: 'SHARC', name: 'Sharc Ecosystem', priceUsd: 0.0084, marketCap: 2100000, volume24h: 890000, liquidity: 85000 },
-      { symbol: 'ALPHA', name: 'Arc Alpha Meme', priceUsd: 0.0019, marketCap: 950000, volume24h: 420000, liquidity: 45000 }
     ]
   },
   {
@@ -86,12 +81,6 @@ export const INITIAL_TOKENS = [
       { pair: 'TOLLY/USDC', dex: 'Tolly Direct Pool (Locked)', volume24h: 22800000, fees: 114000, liquidity: 4200000 },
       { pair: 'TOLLY/ARGUS', dex: 'Tolly Cross-Pair', volume24h: 5400000, fees: 27000, liquidity: 950000 },
       { pair: 'TOLLY/WARP', dex: 'WarpDex Dual Pool', volume24h: 4450000, fees: 22250, liquidity: 650000 }
-    ],
-    ecosystemPairs: [
-      { symbol: 'DOGEARC', name: 'Arc Doge', priceUsd: 0.0057, marketCap: 5700000, volume24h: 2850000, liquidity: 290000 },
-      { symbol: 'PEPEUSDC', name: 'USDC Pepe', priceUsd: 0.0019, marketCap: 1900000, volume24h: 1940000, liquidity: 180000 },
-      { symbol: 'CIRCLE', name: 'Circle Fan Token', priceUsd: 0.0142, marketCap: 7100000, volume24h: 1420000, liquidity: 150000 },
-      { symbol: 'LOCKED', name: 'LockProtocol', priceUsd: 0.0385, marketCap: 3850000, volume24h: 980000, liquidity: 110000 }
     ]
   },
   {
@@ -134,10 +123,6 @@ export const INITIAL_TOKENS = [
       { pair: 'ELLIPS/USDC', dex: 'Ellipsis Primary Pool', volume24h: 8100000, fees: 32400, liquidity: 3200000 },
       { pair: 'ELLIPS/EURC', dex: 'Circle Euro Pool', volume24h: 2100000, fees: 8400, liquidity: 650000 },
       { pair: 'ELLIPS/WETH', dex: 'Ellipsis Bridge Pool', volume24h: 1000000, fees: 4000, liquidity: 250000 }
-    ],
-    ecosystemPairs: [
-      { symbol: 'DOTARC', name: 'Arc Dots', priceUsd: 0.0042, marketCap: 2100000, volume24h: 750000, liquidity: 80000 },
-      { symbol: 'SPEED', name: 'Subsecond Speed', priceUsd: 0.0095, marketCap: 3800000, volume24h: 530000, liquidity: 60000 }
     ]
   },
   {
@@ -180,11 +165,6 @@ export const INITIAL_TOKENS = [
       { pair: 'WARP/USDC', dex: 'WarpDex Bonding Pool', volume24h: 16900000, fees: 84500, liquidity: 3100000 },
       { pair: 'WARP/TOLLY', dex: 'Warp Dual Pool', volume24h: 4900000, fees: 24500, liquidity: 850000 },
       { pair: 'WARP/ARGUS', dex: 'Argus Swap Link', volume24h: 3000000, fees: 15000, liquidity: 650000 }
-    ],
-    ecosystemPairs: [
-      { symbol: 'ROCKET', name: 'Circle Rocket', priceUsd: 0.0076, marketCap: 4500000, volume24h: 3400000, liquidity: 210000 },
-      { symbol: 'MOONUSDC', name: 'Moon Dollar', priceUsd: 0.0028, marketCap: 2800000, volume24h: 1850000, liquidity: 140000 },
-      { symbol: 'BLACKROCK', name: 'B-Rock Meme', priceUsd: 0.0125, marketCap: 3100000, volume24h: 1200000, liquidity: 95000 }
     ]
   }
 ];

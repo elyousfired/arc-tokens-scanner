@@ -81,7 +81,7 @@ export function Scorecard({
             <span className="badge-bull">Bullish</span>
           </div>
           <div className="text-xl font-bold font-mono text-white mt-2">{fmtCompact(token?.volume24h || 18420000)}</div>
-          <div className="text-[10px] text-slate-500 mt-1">{token?.ecosystemPairs?.length || 3}+ tokens quoted in {symbol}</div>
+          <div className="text-[10px] text-slate-500 mt-1">{token?.directPairs?.length || 3} verified AMM liquidity pools</div>
         </div>
 
         <div className="indicator-card">
