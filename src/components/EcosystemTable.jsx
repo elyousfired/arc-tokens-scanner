@@ -51,16 +51,16 @@ export function EcosystemTable({ token, ecosystemPairs = [] }) {
                   </span>
                 </td>
                 <td className="py-3 text-right text-slate-200">
-                  ${fmtNum(p.priceUsd || (token?.basePrice * 0.15) || 0.0075, 4)}
+                  ${fmtNum(p.priceUsd || 0.0050, 4)}
                 </td>
                 <td className="py-3 text-right font-semibold text-white">
                   {fmtCompact(p.volume24h)}
                 </td>
                 <td className="py-3 text-right text-slate-300">
-                  {fmtCompact(p.marketCap || (p.volume24h * 1.8))}
+                  {fmtCompact(p.marketCap || (p.volume24h * 2))}
                 </td>
                 <td className="py-3 text-right text-slate-400">
-                  {fmtCompact(p.liquidity || p.liquidityUsd)}
+                  {fmtCompact(p.liquidity)}
                 </td>
                 <td className="py-3 text-right">
                   <a
