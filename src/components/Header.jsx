@@ -11,6 +11,7 @@ export function Header({
   secondsAgo,
   onRefresh,
   onOpenAddModal,
+  onOpenSwapModal,
 }) {
   const [tokenDropdownOpen, setTokenDropdownOpen] = useState(false);
   const [platformOpen, setPlatformOpen] = useState(false);
@@ -269,15 +270,14 @@ export function Header({
             <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin text-cyan-400" : ""}`} />
           </button>
 
-          <a
-            href="https://testnet.arcscan.app"
-            target="_blank"
-            rel="noreferrer"
-            className="btn-buy hidden sm:inline-flex items-center justify-center font-semibold text-xs h-8 px-3 rounded-md gap-1.5"
+          <button
+            onClick={onOpenSwapModal}
+            className="btn-buy hidden sm:inline-flex items-center justify-center font-semibold text-xs h-8 px-3 rounded-md gap-1.5 cursor-pointer"
+            title={`Trade $${activeToken?.symbol || "ARGUS"} on Arc L1`}
           >
             <span>Trade on Arc</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
-          </a>
+          </button>
 
           {/* Mobile hamburger button */}
           <button
@@ -367,6 +367,18 @@ export function Header({
           >
             Holders Census
           </button>
+          <div className="pt-2">
+            <button
+              onClick={() => {
+                onOpenSwapModal();
+                setMobileMenuOpen(false);
+              }}
+              className="w-full py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5"
+            >
+              <span>Trade ${activeToken?.symbol || "ARGUS"} on Arc</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
           <div className="pt-2 border-t border-slate-800/60 text-xs font-bold text-slate-500 uppercase">Info</div>
           <button
             onClick={() => {

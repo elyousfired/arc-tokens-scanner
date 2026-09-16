@@ -59,7 +59,7 @@ export function TradingPairsTable({ token, pairs = [] }) {
                 </td>
                 <td className="py-3 text-right">
                   <a
-                    href="https://testnet.arcscan.app"
+                    href={`https://testnet.arcscan.app/token/${token?.contract || ""}`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 text-cyan-400 hover:underline text-[11px]"

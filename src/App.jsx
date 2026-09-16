@@ -4,6 +4,7 @@ import { Header } from "./components/Header";
 import { TickerBar } from "./components/TickerBar";
 import { Footer } from "./components/Footer";
 import { AddTokenModal } from "./components/AddTokenModal";
+import { SwapModal } from "./components/SwapModal";
 
 import { OverviewPage } from "./pages/OverviewPage";
 import { FlywheelPage } from "./pages/FlywheelPage";
@@ -31,6 +32,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [secondsAgo, setSecondsAgo] = useState(0);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
 
   // Save tokens to localStorage
   useEffect(() => {
@@ -109,6 +111,7 @@ export default function App() {
         secondsAgo={secondsAgo}
         onRefresh={handleRefresh}
         onOpenAddModal={() => setIsAddModalOpen(true)}
+        onOpenSwapModal={() => setIsSwapModalOpen(true)}
       />
 
       <TickerBar
@@ -133,6 +136,12 @@ export default function App() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAddToken={handleAddToken}
+      />
+
+      <SwapModal
+        token={activeToken}
+        isOpen={isSwapModalOpen}
+        onClose={() => setIsSwapModalOpen(false)}
       />
     </div>
   );
