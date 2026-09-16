@@ -3,6 +3,9 @@ export function formatUSD(val, decimals = 2) {
   if (val >= 1e9) return `$${(val / 1e9).toFixed(decimals)}B`;
   if (val >= 1e6) return `$${(val / 1e6).toFixed(decimals)}M`;
   if (val >= 1e3) return `$${(val / 1e3).toFixed(decimals)}K`;
+  if (val > 0 && val < 0.01) {
+    return `$${Number(val).toFixed(Math.max(decimals, 6))}`;
+  }
   return `$${Number(val).toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
 }
 
@@ -21,19 +24,16 @@ export function truncateAddress(addr) {
 
 // 🧮 Calcule tous les indicateurs Ember pour un token
 export function calculateEmberTokenMetrics(token) {
-  const currentPrice = token.basePrice;
-  const initialSupply = token.initialSupply;
-  const currentSupply = token.currentSupply;
-  const totalBurnedTokens = token.totalBurned;
-  const pendingBurnTokens = token.pendingBurn;
+  const currentPrice = token.basePrice || 0;
+  const initialSupply = token.initialSupply || 1000000000;
+  const currentSupply = token.currentSupply || initialSupply;
+  const totalBurnedTokens = token.totalBurned || 0;
+  const pendingBurnTokens = token.pendingBurn || 0;
   const grandTotalBurnTokens = totalBurnedTokens + pendingBurnTokens;
   const pctBurned = ((grandTotalBurnTokens / initialSupply) * 100);
 
   // 1. Calcul des Volumes & Fees 24h
-  let totalVolume24h = token.volume24h;
-  if (token.directPairs && token.directPairs.length > 0) {
-    totalVolume24h = token.directPairs.reduce((acc, p) => acc + (p.volume24h || 0), 0);
-  }
+  let totalVolume24h = token.volume24h || (token.directPairs ? token.directPairs.reduce((acc, p) => acc + (p.volume24h || 0), 0) : 0);
   const ecosystemVolume24h = token.ecosystemPairs 
     ? token.ecosystemPairs.reduce((acc, p) => acc + (p.volume24h || 0), 0)
     : 0;

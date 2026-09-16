@@ -12,7 +12,7 @@ export function DailyBuybacksChart({
 }) {
   const symbol = token?.symbol || "ARGUS";
   const color = token?.color || "#38bdf8";
-  const price = currentPrice || token?.basePrice || 0.0482;
+  const price = currentPrice || token?.basePrice || 0;
   const targetBurned = totalBurnedTokens || token?.totalBurned || 65750000;
 
   // Generate dynamic calendar days based on current Date (UTC)

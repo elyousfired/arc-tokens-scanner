@@ -55,7 +55,7 @@ export default function App() {
           const newPrice = live.priceUsd;
           const newVol = live.volume24h || t.volume24h;
           const newLiq = live.liquidity || t.liquidity;
-          const newMc = Math.round(t.currentSupply * newPrice);
+          const newMc = live.marketCap || Math.round(t.currentSupply * newPrice);
 
           return {
             ...t,
@@ -63,6 +63,7 @@ export default function App() {
             volume24h: newVol,
             liquidity: newLiq,
             marketCap: newMc,
+            topPairUrl: live.topPairUrl || t.topPairUrl,
             priceChanges: live.priceChanges || t.priceChanges,
             directPairs: live.directPairs && live.directPairs.length > 0 ? live.directPairs : t.directPairs,
           };
@@ -123,9 +124,18 @@ export default function App() {
       case "pairs":
         return <PairsPage token={activeToken} />;
       case "tokens":
-        return <TokensPage token={activeToken} />;
+        return (
+          <TokensPage
+            token={activeToken}
+            allTokens={tokens}
+            onSelectToken={(t) => {
+              setActiveToken(t);
+              setCurrentPage("overview");
+            }}
+          />
+        );
       case "launches":
-        return <LaunchesPage token={activeToken} />;
+        return <LaunchesPage token={activeToken} allTokens={tokens} />;
       case "holders":
         return <HoldersPage token={activeToken} />;
       case "rewards":
@@ -167,7 +177,7 @@ export default function App() {
       <TickerBar
         token={activeToken}
         price={activeToken?.basePrice}
-        priceChange={activeToken?.priceChanges?.h24 ? parseFloat(activeToken.priceChanges.h24) : 38.5}
+        priceChange={activeToken?.priceChanges?.h24 ? parseFloat(activeToken.priceChanges.h24) : 0}
         mcap={activeToken?.marketCap}
         vol24h={activeToken?.volume24h}
         burnedPct={(activeToken?.totalBurned / activeToken?.initialSupply) * 100}

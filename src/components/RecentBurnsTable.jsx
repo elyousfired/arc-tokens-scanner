@@ -8,7 +8,7 @@ export function RecentBurnsTable({ token, burnWallet }) {
   const [filter, setFilter] = useState("all");
   const [selectedTx, setSelectedTx] = useState(null);
   const symbol = token?.symbol || "ARGUS";
-  const price = token?.basePrice || 0.0482;
+  const price = token?.basePrice || 0;
 
   // Generated on-chain transactions matching Arcscan
   const burns = [
@@ -178,7 +178,7 @@ export function RecentBurnsTable({ token, burnWallet }) {
       <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-400">
         <span>Verified Arcscan Contract Audit</span>
         <a
-          href={`https://testnet.arcscan.app/address/${token?.burnWallet || "0x000000000000000000000000000000000000dEaD"}`}
+          href={`https://arc.etherscan.io/address/${token?.burnWallet || "0x000000000000000000000000000000000000dEaD"}`}
           target="_blank"
           rel="noreferrer"
           className="text-cyan-400 hover:underline flex items-center gap-1"

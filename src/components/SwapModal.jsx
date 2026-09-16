@@ -6,7 +6,7 @@ export function SwapModal({ token, isOpen, onClose }) {
   if (!isOpen || !token) return null;
 
   const symbol = token?.symbol || 'ARGUS';
-  const price = token?.basePrice || 0.0482;
+  const price = token?.basePrice || 0;
   const contract = token?.contract || '0xece5ca8bf9220718e5727754026757512212cb3c';
 
   const [payAmount, setPayAmount] = useState('100');
@@ -16,7 +16,7 @@ export function SwapModal({ token, isOpen, onClose }) {
   const [txHash, setTxHash] = useState('');
 
   const numPay = parseFloat(payAmount) || 0;
-  const receiveAmount = numPay > 0 ? numPay / price : 0;
+  const receiveAmount = numPay > 0 && price > 0 ? numPay / price : 0;
   const gasUsdc = 0.001024;
   const minReceived = receiveAmount * 0.995;
 
@@ -102,7 +102,7 @@ export function SwapModal({ token, isOpen, onClose }) {
                 Trade Again
               </button>
               <a
-                href={`https://testnet.arcscan.app/token/${contract}`}
+                href={`https://arc.etherscan.io/token/${contract}`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex-1 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 font-bold flex items-center justify-center gap-1.5 transition"
@@ -208,7 +208,7 @@ export function SwapModal({ token, isOpen, onClose }) {
                   <span>{copied ? 'Copied' : 'Copy'}</span>
                 </button>
                 <a
-                  href={`https://testnet.arcscan.app/token/${contract}`}
+                  href={`https://arc.etherscan.io/token/${contract}`}
                   target="_blank"
                   rel="noreferrer"
                   className="text-cyan-400 hover:underline flex items-center gap-1"
@@ -218,6 +218,24 @@ export function SwapModal({ token, isOpen, onClose }) {
                 </a>
               </div>
             </div>
+
+            {/* Live Pool Link */}
+            {token?.directPairs?.[0]?.url && (
+              <a
+                href={token.directPairs[0].url}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full py-2 px-3 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 text-xs flex items-center justify-between transition"
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span>Trade directly on {token.dex || "Arc AMM"}</span>
+                </span>
+                <span className="text-cyan-400 font-bold flex items-center gap-1">
+                  Open DEX Pool <ExternalLink className="w-3 h-3" />
+                </span>
+              </a>
+            )}
 
             {/* Submit Button */}
             <button
@@ -233,7 +251,7 @@ export function SwapModal({ token, isOpen, onClose }) {
               ) : (
                 <>
                   <Zap className="w-4 h-4 fill-current" />
-                  <span>Execute Swap (${symbol})</span>
+                  <span>Simulate Swap (${symbol})</span>
                 </>
               )}
             </button>

@@ -131,7 +131,7 @@ export default function TokenDeepDive({
                     {copiedContract ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                   <a 
-                    href={`https://testnet.arcscan.io/token/${token.contract}`}
+                    href={`https://arc.etherscan.io/token/${token.contract}`}
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="hover:text-arc-cyan transition-colors"
@@ -914,10 +914,10 @@ export default function TokenDeepDive({
             <div className="p-5 rounded-xl bg-arc-dark/80 border border-arc-border space-y-3">
               <span className="text-xs font-mono text-gray-300 font-bold block">Explorer Arcscan</span>
               <p className="text-xs text-gray-400 font-mono">
-                Consulter les blocs récents, les transferts ERC-20 et le code source vérifié du contrat sur Arc Testnet.
+                Consulter les blocs récents, les transferts ERC-20 et le code source vérifié du contrat sur Arc L1 Blockchain.
               </p>
               <a
-                href={`https://testnet.arcscan.io/token/${token.contract}`}
+                href={`https://arc.etherscan.io/token/${token.contract}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan text-xs font-mono font-bold hover:bg-arc-cyan/20 transition-all"

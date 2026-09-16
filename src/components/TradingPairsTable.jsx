@@ -46,7 +46,7 @@ export function TradingPairsTable({ token, pairs = [] }) {
                 </td>
                 <td className="py-3 text-slate-400">{p.dex}</td>
                 <td className="py-3 text-right text-slate-200">
-                  ${fmtNum(token?.basePrice || 0.0482, 4)}
+                  ${fmtNum(token?.basePrice || 0, 4)}
                 </td>
                 <td className="py-3 text-right font-semibold text-white">
                   {fmtCompact(p.volume24h)}
@@ -59,12 +59,12 @@ export function TradingPairsTable({ token, pairs = [] }) {
                 </td>
                 <td className="py-3 text-right">
                   <a
-                    href={`https://testnet.arcscan.app/token/${token?.contract || ""}`}
+                    href={p.url || `https://arc.etherscan.io/token/${token?.contract || ""}`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 text-cyan-400 hover:underline text-[11px]"
                   >
-                    Arcscan <ExternalLink className="w-3 h-3" />
+                    {p.url ? "DexPool" : "Arcscan"} <ExternalLink className="w-3 h-3" />
                   </a>
                 </td>
               </tr>

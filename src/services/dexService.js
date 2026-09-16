@@ -13,8 +13,14 @@ export async function fetchLiveTokenData(contractAddress) {
     const totalVolume24h = Math.round(pairsToUse.reduce((sum, p) => sum + (p.volume?.h24 || 0), 0) || (topPair.volume?.h24 || 0));
     const totalLiquidity = Math.round(pairsToUse.reduce((sum, p) => sum + (p.liquidity?.usd || 0), 0) || (topPair.liquidity?.usd || 0));
 
+    const marketCap = Math.round(topPair.marketCap || topPair.fdv || (priceUsd * 1000000000));
+    const txns24h = Math.round(((topPair.txns?.h24?.buys || 0) + (topPair.txns?.h24?.sells || 0)));
+
     return {
       priceUsd,
+      marketCap,
+      txns24h,
+      topPairUrl: topPair.url,
       volume24h: totalVolume24h,
       liquidity: totalLiquidity,
       priceChanges: {

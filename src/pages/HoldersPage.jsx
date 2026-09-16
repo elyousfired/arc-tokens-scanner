@@ -6,7 +6,7 @@ export function HoldersPage({ token }) {
   const symbol = token?.symbol || "ARGUS";
   const currentSupply = token?.currentSupply || 934250000;
   const burned = token?.totalBurned || 65750000;
-  const price = token?.basePrice || 0.0482;
+  const price = token?.basePrice || 0;
 
   const topWallets = [
     {
@@ -137,7 +137,7 @@ export function HoldersPage({ token }) {
                 </td>
                 <td className="py-3 text-right">
                   <a
-                    href={`https://testnet.arcscan.app/address/${w.address}`}
+                    href={`https://arc.etherscan.io/address/${w.address}`}
                     target="_blank"
                     rel="noreferrer"
                     className="text-cyan-400 hover:underline flex items-center justify-end gap-1 text-[11px]"

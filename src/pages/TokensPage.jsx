@@ -3,7 +3,7 @@ import { Coins, Search, ExternalLink, Filter, ShieldCheck, Copy, Check } from "l
 import { fmtCompact, fmtNum } from "../lib/format";
 import { INITIAL_TOKENS } from "../data/tokens";
 
-export function TokensPage({ token, onSelectToken }) {
+export function TokensPage({ token, allTokens, onSelectToken }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("volume24h");
   const [copiedContract, setCopiedContract] = useState(null);
@@ -14,7 +14,8 @@ export function TokensPage({ token, onSelectToken }) {
     setTimeout(() => setCopiedContract(null), 2000);
   };
 
-  const filteredTokens = INITIAL_TOKENS
+  const tokenList = allTokens && allTokens.length > 0 ? allTokens : INITIAL_TOKENS;
+  const filteredTokens = tokenList
     .filter(
       (t) =>
         t.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -93,12 +94,15 @@ export function TokensPage({ token, onSelectToken }) {
           <tbody className="divide-y divide-slate-800/50">
             {filteredTokens.map((t, idx) => {
               const burnedPct = (t.totalBurned / t.initialSupply) * 100;
-              const chg = t.priceChanges?.h24 ? parseFloat(t.priceChanges.h24) : 38.5;
+              const chg = t.priceChanges?.h24 ? parseFloat(t.priceChanges.h24) : 0;
               return (
                 <tr key={t.id} className="hover:bg-slate-800/30 transition">
                   <td className="py-3 text-slate-500">{String(idx + 1).padStart(2, "0")}</td>
                   <td className="py-3">
-                    <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onSelectToken && onSelectToken(t)}
+                      className="flex items-center gap-2 text-left hover:opacity-80 transition cursor-pointer"
+                    >
                       <span className="text-lg">{t.icon}</span>
                       <div>
                         <div className="font-bold text-white text-sm flex items-center gap-1.5">
@@ -109,7 +113,7 @@ export function TokensPage({ token, onSelectToken }) {
                         </div>
                         <div className="text-[10px] text-slate-400">{t.name}</div>
                       </div>
-                    </div>
+                    </button>
                   </td>
                   <td className="py-3">
                     <div className="flex items-center gap-1.5">
@@ -118,7 +122,7 @@ export function TokensPage({ token, onSelectToken }) {
                       </span>
                       <button
                         onClick={() => copyContract(t.contract, t.id)}
-                        className="text-slate-500 hover:text-cyan-400 p-0.5"
+                        className="text-slate-500 hover:text-cyan-400 p-0.5 cursor-pointer"
                         title="Copy Contract"
                       >
                         {copiedContract === t.id ? (
@@ -138,7 +142,7 @@ export function TokensPage({ token, onSelectToken }) {
                   <td className="py-3 text-right text-orange-400 font-semibold">{fmtNum(burnedPct, 2)}%</td>
                   <td className="py-3 text-right">
                     <a
-                      href={`https://testnet.arcscan.app/token/${t.contract}`}
+                      href={`https://arc.etherscan.io/token/${t.contract}`}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 px-2 py-1 rounded transition"

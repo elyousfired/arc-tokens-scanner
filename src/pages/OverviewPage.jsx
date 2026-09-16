@@ -8,18 +8,18 @@ import { FlywheelSimulator } from "../components/FlywheelSimulator";
 import { TradingPairsTable } from "../components/TradingPairsTable";
 
 export function OverviewPage({ token, onNavigate }) {
-  const price = token?.basePrice || 0.0482;
-  const priceChange = token?.priceChanges?.h24 ? parseFloat(token.priceChanges.h24) : 38.5;
+  const price = token?.basePrice || 0;
+  const priceChange = token?.priceChanges?.h24 ? parseFloat(token.priceChanges.h24) : 0;
   const supply = token?.currentSupply || 934250000;
   const burned = token?.totalBurned || 65750000;
   const burnedPct = (burned / (token?.initialSupply || 1000000000)) * 100;
   const burnedUsd = burned * price;
-  const vol24h = token?.volume24h || 18420000;
-  const liquidity = token?.liquidity || 3250000;
-  const burnWalletPending = token?.pendingBurn || 4120000;
+  const vol24h = token?.volume24h || 0;
+  const liquidity = token?.liquidity || 0;
+  const burnWalletPending = token?.pendingBurn || 0;
   const dailyFees = (vol24h * (token?.feeRatePct || 1.0)) / 100;
   const dailyBuybackPressure = dailyFees * ((token?.feeDistribution?.burnPct || 50) / 100);
-  const burnVelocity = ((dailyBuybackPressure / price) / supply) * 100;
+  const burnVelocity = price > 0 && supply > 0 ? (((dailyBuybackPressure / price) / supply) * 100) : 0;
 
   return (
     <div className="space-y-8">

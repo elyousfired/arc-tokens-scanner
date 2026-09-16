@@ -119,18 +119,18 @@ export function TransactionModal({ txData, token, isOpen, onClose }) {
         {/* Footer actions */}
         <div className="mt-5 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
           <span className="text-slate-500 text-[11px] font-mono">
-            Arcscan Explorer: <a href="https://testnet.arcscan.app" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">testnet.arcscan.app</a>
+            Arcscan Explorer: <a href="https://arc.etherscan.io" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">arc.etherscan.io</a>
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => copy(txData.tx, "modal_tx")}
-              className="px-3 py-1.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5 font-mono"
+              className="px-3 py-1.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5 font-mono cursor-pointer"
             >
               <Copy className="w-3.5 h-3.5" />
               <span>{copied === "modal_tx" ? "Copied!" : "Copy TX"}</span>
             </button>
             <a
-              href="https://testnet.arcscan.app"
+              href={`https://arc.etherscan.io/tx/${txData.tx}`}
               target="_blank"
               rel="noreferrer"
               className="btn-buy px-3 py-1.5 rounded flex items-center gap-1.5 font-mono font-bold"

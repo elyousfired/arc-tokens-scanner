@@ -7,11 +7,11 @@ import { fmtCompact } from "../lib/format";
 
 export function FlywheelPage({ token }) {
   const symbol = token?.symbol || "ARGUS";
-  const price = token?.basePrice || 0.0482;
+  const price = token?.basePrice || 0;
   const supply = token?.currentSupply || 934250000;
   const burned = token?.totalBurned || 65750000;
   const burnedUsd = burned * price;
-  const totalVol = token?.volume24h || 18420000;
+  const totalVol = token?.volume24h || 0;
   const dailyFees = (totalVol * (token?.feeRatePct || 1.0)) / 100;
   const burnPct = token?.feeDistribution?.burnPct || 50;
   const holdersPct = token?.feeDistribution?.holdersPct || 25;

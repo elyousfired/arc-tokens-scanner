@@ -7,12 +7,12 @@ export function PriceCandleChart({ token, currentPrice, priceChange }) {
   const [timeframe, setTimeframe] = useState("1h");
   const symbol = token?.symbol || "ARGUS";
   const color = token?.color || "#38bdf8";
-  const baseP = currentPrice || token?.basePrice || 0.0482;
+  const baseP = currentPrice || token?.basePrice || 0;
 
   const chartData = useMemo(() => {
     const points = timeframe === "15m" ? 24 : timeframe === "1h" ? 48 : timeframe === "4h" ? 60 : 30;
     const data = [];
-    let price = baseP * (1 - (priceChange || 20) / 100 * 0.7);
+    let price = baseP * (1 - (priceChange || 0) / 100 * 0.7);
 
     for (let i = 0; i < points; i++) {
       const volatility = (Math.random() - 0.48) * (baseP * 0.04);
@@ -51,7 +51,7 @@ export function PriceCandleChart({ token, currentPrice, priceChange }) {
                 (priceChange ?? 0) >= 0 ? "text-green-400" : "text-red-400"
               }`}>
                 <TrendingUp className="w-3.5 h-3.5 mr-0.5" />
-                {(priceChange ?? 0) >= 0 ? `+${fmtNum(priceChange || 38.5, 1)}%` : `${fmtNum(priceChange, 1)}%`} 24h
+                {(priceChange ?? 0) >= 0 ? `+${fmtNum(priceChange || 0, 1)}%` : `${fmtNum(priceChange, 1)}%`} 24h
               </span>
             </div>
           </div>

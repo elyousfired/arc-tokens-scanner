@@ -64,7 +64,7 @@ export function EcosystemTable({ token, ecosystemPairs = [] }) {
                 </td>
                 <td className="py-3 text-right">
                   <a
-                    href="https://testnet.arcscan.app"
+                    href="https://arc.etherscan.io"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 px-2 py-1 rounded transition"

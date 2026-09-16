@@ -85,7 +85,7 @@ export function AboutPage({ token }) {
               <div className="text-white font-bold">{contract}</div>
             </div>
             <a
-              href={`https://testnet.arcscan.app/token/${contract}`}
+              href={`https://arc.etherscan.io/token/${contract}`}
               target="_blank"
               rel="noreferrer"
               className="text-cyan-400 hover:underline flex items-center gap-1 text-[11px]"
@@ -100,7 +100,7 @@ export function AboutPage({ token }) {
               <div className="text-white font-bold">{burnWallet}</div>
             </div>
             <a
-              href={`https://testnet.arcscan.app/address/${burnWallet}`}
+              href={`https://arc.etherscan.io/address/${burnWallet}`}
               target="_blank"
               rel="noreferrer"
               className="text-cyan-400 hover:underline flex items-center gap-1 text-[11px]"

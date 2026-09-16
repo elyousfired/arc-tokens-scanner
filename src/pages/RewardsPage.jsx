@@ -6,9 +6,9 @@ import { fmtCompact, fmtNum } from "../lib/format";
 export function RewardsPage({ token }) {
   const [holdingAmount, setHoldingAmount] = useState(25000);
   const symbol = token?.symbol || "ARGUS";
-  const price = token?.basePrice || 0.0482;
+  const price = token?.basePrice || 0;
   const currentSupply = token?.currentSupply || 934250000;
-  const totalVol = token?.volume24h || 18420000;
+  const totalVol = token?.volume24h || 0;
   const dailyFees = (totalVol * (token?.feeRatePct || 1.0)) / 100;
   const holdersSharePct = (token?.feeDistribution?.holdersPct || 25) / 100;
   const dailyPool = dailyFees * holdersSharePct;
@@ -19,7 +19,7 @@ export function RewardsPage({ token }) {
   const monthlyPayout = dailyPayout * 30;
   const annualPayout = dailyPayout * 365;
   const holdingValue = holdingAmount * price;
-  const apy = holdingValue > 0 ? (annualPayout / holdingValue) * 100 : 38.5;
+  const apy = holdingValue > 0 ? (annualPayout / holdingValue) * 100 : 0;
 
   const payoutsHistory = [
     { date: "Day -4", payout: dailyPool * 0.85 },

@@ -13,14 +13,14 @@ export function TickerBar({
   dailyFees,
 }) {
   const symbol = token?.symbol || "ARGUS";
-  const p = price || token?.basePrice || 0.0482;
-  const chg = priceChange || 38.5;
-  const mc = mcap || token?.marketCap || 45030850;
-  const vol = vol24h || token?.volume24h || 18420000;
-  const bpct = burnedPct || (token?.totalBurned / token?.initialSupply * 100) || 6.57;
-  const liq = liquidity || token?.liquidity || 3250000;
-  const pending = burnWalletPending || token?.pendingBurn || 4120000;
-  const fees = dailyFees || (vol * (token?.feeRatePct || 1.0) / 100) || 184200;
+  const p = price || token?.basePrice || 0;
+  const chg = priceChange !== undefined && priceChange !== null ? priceChange : (token?.priceChanges?.h24 ? parseFloat(token.priceChanges.h24) : 0);
+  const mc = mcap || token?.marketCap || 0;
+  const vol = vol24h || token?.volume24h || 0;
+  const bpct = burnedPct !== undefined && !isNaN(burnedPct) ? burnedPct : (token?.initialSupply ? (token.totalBurned / token.initialSupply * 100) : 0);
+  const liq = liquidity || token?.liquidity || 0;
+  const pending = burnWalletPending || token?.pendingBurn || 0;
+  const fees = dailyFees || (vol * (token?.feeRatePct || 1.0) / 100);
 
   return (
     <div className="border-b border-slate-800/80 bg-slate-950/60 text-xs py-2 px-4 sm:px-6 overflow-x-auto select-none">

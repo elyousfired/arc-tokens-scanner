@@ -17,7 +17,7 @@ export function Footer({ token }) {
 
         <div className="flex items-center gap-4 font-mono text-[11px]">
           <a
-            href={`https://testnet.arcscan.app/token/${contract}`}
+            href={`https://arc.etherscan.io/token/${contract}`}
             target="_blank"
             rel="noreferrer"
             className="hover:text-slate-300 transition"
@@ -25,7 +25,7 @@ export function Footer({ token }) {
             Token on Arcscan ↗
           </a>
           <a
-            href={`https://testnet.arcscan.app/address/${burnWallet}`}
+            href={`https://arc.etherscan.io/address/${burnWallet}`}
             target="_blank"
             rel="noreferrer"
             className="hover:text-slate-300 transition"
@@ -33,7 +33,7 @@ export function Footer({ token }) {
             Burn Contract ↗
           </a>
           <a
-            href="https://testnet.arcscan.app"
+            href="https://arc.etherscan.io"
             target="_blank"
             rel="noreferrer"
             className="text-cyan-400 hover:underline transition"

@@ -2,56 +2,27 @@ import React, { useState } from "react";
 import { Rocket, CheckCircle2, Clock, ArrowUpRight, Filter } from "lucide-react";
 import { fmtCompact, fmtNum } from "../lib/format";
 
-export function LaunchesPage({ token }) {
+import { INITIAL_TOKENS } from "../data/tokens";
+
+export function LaunchesPage({ token, allTokens }) {
   const symbol = token?.symbol || "ARGUS";
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const launches = [
-    {
-      name: "Circle Warp AMM",
-      symbol: "WARP",
-      createdAgo: "1h ago",
-      bondingProgress: 91.5,
-      graduated: false,
-      mcap: 49453200,
-      volume24h: 24800000,
-      creator: "0x384c...115e",
-      dexTarget: "Arc L1 AMM Hooks",
-    },
-    {
-      name: "ArgusPad Token",
-      symbol: "ARGUS",
-      createdAgo: "3d ago",
-      bondingProgress: 100,
-      graduated: true,
-      mcap: 45030850,
-      volume24h: 18420000,
-      creator: "0xece5...cb3c",
-      dexTarget: "ArgusSwap Main Pool",
-    },
-    {
-      name: "Tolly Protocol",
-      symbol: "TOLLY",
-      createdAgo: "4d ago",
-      bondingProgress: 100,
-      graduated: true,
-      mcap: 73210500,
-      volume24h: 32650000,
-      creator: "0xbc43...0b67",
-      dexTarget: "Tolly Instant DEX",
-    },
-    {
-      name: "Ellipsis Stables",
-      symbol: "ELLIPS",
-      createdAgo: "2d ago",
-      bondingProgress: 100,
-      graduated: true,
-      mcap: 21037750,
-      volume24h: 11200000,
-      creator: "0x86f7...222e",
-      dexTarget: "Ellipsis Curve AMM",
-    },
-  ];
+  const sourceTokens = allTokens && allTokens.length > 0 ? allTokens : INITIAL_TOKENS;
+  const launches = sourceTokens.map((t) => ({
+    name: t.name,
+    symbol: t.symbol,
+    icon: t.icon,
+    contract: t.contract,
+    createdAgo: t.symbol === "WARP" ? "1h ago" : t.symbol === "ELLIPS" ? "2d ago" : t.symbol === "ARGUS" ? "3d ago" : "4d ago",
+    bondingProgress: t.curveProgress || 100,
+    graduated: (t.curveProgress || 100) >= 100,
+    mcap: t.marketCap,
+    volume24h: t.volume24h,
+    creator: `${t.contract.slice(0, 6)}...${t.contract.slice(-4)}`,
+    dexTarget: t.dex || "Arc L1 AMM Hooks",
+    url: `https://arc.etherscan.io/token/${t.contract}`,
+  }));
 
   const filtered = launches.filter((l) => {
     if (filterStatus === "graduated") return l.graduated;
@@ -149,12 +120,12 @@ export function LaunchesPage({ token }) {
             <div className="flex items-center justify-between text-[11px] font-mono pt-2 text-slate-500">
               <span>Venue: {l.dexTarget}</span>
               <a
-                href="https://testnet.arcscan.app"
+                href={l.url || `https://arc.etherscan.io/token/${l.contract}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-cyan-400 hover:underline flex items-center gap-0.5"
               >
-                Inspect ↗
+                Arcscan ↗
               </a>
             </div>
           </div>

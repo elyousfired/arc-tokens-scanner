@@ -8,7 +8,7 @@ export function FlywheelSimulator({ token, price, supply, volume24h }) {
   const [poolDepth, setPoolDepth] = useState(token?.liquidity || 3250000);
 
   const symbol = token?.symbol || "ARGUS";
-  const baseP = price || token?.basePrice || 0.0482;
+  const baseP = price || token?.basePrice || 0;
   const currentSupply = supply || token?.currentSupply || 934250000;
   const vol = volume24h || token?.volume24h || 18420000;
 
