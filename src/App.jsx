@@ -5,6 +5,7 @@ import { TickerBar } from "./components/TickerBar";
 import { Footer } from "./components/Footer";
 import { AddTokenModal } from "./components/AddTokenModal";
 import { SwapModal } from "./components/SwapModal";
+import { fetchLiveTokenData } from "./services/dexService";
 
 import { OverviewPage } from "./pages/OverviewPage";
 import { FlywheelPage } from "./pages/FlywheelPage";
@@ -20,7 +21,7 @@ import { AllTokensHub } from "./pages/AllTokensHub";
 export default function App() {
   const [tokens, setTokens] = useState(() => {
     try {
-      const saved = localStorage.getItem("arc_scanner_tokens_v4");
+      const saved = localStorage.getItem("arc_scanner_tokens_v5");
       return saved ? JSON.parse(saved) : INITIAL_TOKENS;
     } catch {
       return INITIAL_TOKENS;
@@ -37,9 +38,62 @@ export default function App() {
   // Save tokens to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem("arc_scanner_tokens_v4", JSON.stringify(tokens));
+      localStorage.setItem("arc_scanner_tokens_v5", JSON.stringify(tokens));
     } catch {}
   }, [tokens]);
+
+  // Sync real-time DexScreener prices
+  const syncLivePrices = async () => {
+    try {
+      setLoading(true);
+      const updatedTokens = await Promise.all(
+        tokens.map(async (t) => {
+          if (!t.contract) return t;
+          const live = await fetchLiveTokenData(t.contract);
+          if (!live || !live.priceUsd) return t;
+
+          const newPrice = live.priceUsd;
+          const newVol = live.volume24h || t.volume24h;
+          const newLiq = live.liquidity || t.liquidity;
+          const newMc = Math.round(t.currentSupply * newPrice);
+
+          return {
+            ...t,
+            basePrice: newPrice,
+            volume24h: newVol,
+            liquidity: newLiq,
+            marketCap: newMc,
+            priceChanges: live.priceChanges || t.priceChanges,
+            directPairs: live.directPairs && live.directPairs.length > 0 ? live.directPairs : t.directPairs,
+          };
+        })
+      );
+
+      setTokens(updatedTokens);
+      setSecondsAgo(0);
+    } catch (e) {
+      console.error("Live price sync failed:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sync activeToken with updated tokens list
+  useEffect(() => {
+    const current = tokens.find((t) => t.id === activeToken?.id);
+    if (current && (current.basePrice !== activeToken.basePrice || current.volume24h !== activeToken.volume24h)) {
+      setActiveToken(current);
+    }
+  }, [tokens, activeToken?.id]);
+
+  // Initial fetch and 30s polling
+  useEffect(() => {
+    syncLivePrices();
+    const pollTimer = setInterval(() => {
+      syncLivePrices();
+    }, 30000);
+    return () => clearInterval(pollTimer);
+  }, []);
 
   // Seconds counter
   useEffect(() => {
@@ -50,11 +104,7 @@ export default function App() {
   }, []);
 
   const handleRefresh = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSecondsAgo(0);
-    }, 800);
+    syncLivePrices();
   };
 
   const handleAddToken = (newToken) => {

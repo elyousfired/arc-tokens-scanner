@@ -1,8 +1,18 @@
 export function fmtNum(num, digits = 2) {
   if (num === undefined || num === null || isNaN(num)) return "—";
+  let d = digits;
+  if (num > 0 && num < 0.0001) {
+    d = Math.max(digits, 7);
+  } else if (num > 0 && num < 0.001) {
+    d = Math.max(digits, 6);
+  } else if (num > 0 && num < 0.01) {
+    d = Math.max(digits, 5);
+  } else if (num > 0 && num < 0.1) {
+    d = Math.max(digits, 4);
+  }
   return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
+    minimumFractionDigits: d,
+    maximumFractionDigits: d,
   }).format(num);
 }
 
