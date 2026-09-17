@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Zap, Flame, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check } from "lucide-react";
+import { Zap, Flame, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check, Clock } from "lucide-react";
 
 export function Header({
   activeToken,
@@ -140,6 +140,20 @@ export function Header({
               <Flame className="w-3.5 h-3.5 text-orange-400" />
               <span>Live Burns</span>
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping" />
+            </button>
+
+            <button
+              onClick={() => onNavigate("fresh-burns")}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-medium transition cursor-pointer ${
+                currentPage === "fresh-burns"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold shadow-lg shadow-cyan-500/10"
+                  : "text-slate-300 hover:text-white"
+              }`}
+              title="Tokens burning in last 15M, 30M, 1H, 4H, and 24H"
+            >
+              <Clock className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Fresh Burns (1H-24H)</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
             </button>
 
             {/* Platform Dropdown */}
@@ -325,6 +339,16 @@ export function Header({
           >
             <Flame className="w-4 h-4 text-orange-400" />
             <span>Live Burn Scanner (0x...dEaD)</span>
+          </button>
+          <button
+            onClick={() => {
+              onNavigate("fresh-burns");
+              setMobileMenuOpen(false);
+            }}
+            className="flex items-center gap-2 w-full text-left py-1.5 text-cyan-400 font-bold"
+          >
+            <Clock className="w-4 h-4 text-cyan-400" />
+            <span>Fresh Burns Radar (1H - 24H)</span>
           </button>
           <div className="pt-2 border-t border-slate-800/60 text-xs font-bold text-slate-500 uppercase">Platform</div>
           <button

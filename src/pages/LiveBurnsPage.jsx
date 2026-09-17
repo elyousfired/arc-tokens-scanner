@@ -177,7 +177,7 @@ const TOP_BURN_LEADERBOARD = [
   }
 ];
 
-export function LiveBurnsPage({ token, allTokens = [], onSelectToken }) {
+export function LiveBurnsPage({ token, allTokens = [], onSelectToken, onNavigate }) {
   const [activeTab, setActiveTab] = useState("top10"); // "top10" | "stream"
   const [leaderboardSort, setLeaderboardSort] = useState("usd"); // "usd" | "pct" | "tokens"
   const [liquidityFilter, setLiquidityFilter] = useState("all"); // "all" | "liquid"
@@ -401,6 +401,16 @@ export function LiveBurnsPage({ token, allTokens = [], onSelectToken }) {
             <Flame className="w-4 h-4 text-cyan-400 animate-pulse" />
             <span>🔥 LIVE REAL-TIME STREAM ({burns.length})</span>
           </button>
+
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate("fresh-burns")}
+              className="px-4 py-2 rounded-lg text-xs font-mono font-bold flex items-center gap-2 transition cursor-pointer bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 shadow-lg shadow-cyan-500/5"
+            >
+              <Zap className="w-4 h-4 text-cyan-400" />
+              <span>⚡ FRESH BURNS (15M-24H) ↗</span>
+            </button>
+          )}
         </div>
 
         {/* Search bar */}

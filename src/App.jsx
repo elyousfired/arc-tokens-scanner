@@ -9,6 +9,7 @@ import { fetchLiveTokenData, fetchOnchainBurnData } from "./services/dexService"
 
 import { OverviewPage } from "./pages/OverviewPage";
 import { LiveBurnsPage } from "./pages/LiveBurnsPage";
+import { HourlyBurnsPage } from "./pages/HourlyBurnsPage";
 import { FlywheelPage } from "./pages/FlywheelPage";
 import { PairsPage } from "./pages/PairsPage";
 import { TokensPage } from "./pages/TokensPage";
@@ -140,6 +141,20 @@ export default function App() {
               setActiveToken(t);
               setCurrentPage("overview");
             }}
+            onNavigate={setCurrentPage}
+          />
+        );
+      case "fresh-burns":
+      case "hourly":
+        return (
+          <HourlyBurnsPage
+            token={activeToken}
+            allTokens={tokens}
+            onSelectToken={(t) => {
+              setActiveToken(t);
+              setCurrentPage("overview");
+            }}
+            onNavigate={setCurrentPage}
           />
         );
       case "flywheel":
