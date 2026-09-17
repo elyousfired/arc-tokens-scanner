@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { 
   Flame, RefreshCw, ExternalLink, Copy, Check, Search, ShieldCheck, 
   Trophy, TrendingUp, Filter, BarChart3, ArrowUpRight, Zap,
@@ -8,7 +9,7 @@ import { fmtCompact, fmtNum } from "../lib/format";
 import { TransactionModal } from "../components/TransactionModal";
 
 // Top 10 Leaderboard verified directly from 0x000000000000000000000000000000000000dEaD on Arc L1
-export const TOP_BURN_LEADERBOARD = [
+const TOP_BURN_LEADERBOARD = [
   {
     rank: 1,
     symbol: "ARGUS",
