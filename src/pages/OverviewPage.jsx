@@ -22,6 +22,11 @@ export function OverviewPage({ token, onNavigate }) {
   const dailyFees = (vol24h * (token?.feeRatePct || 1.0)) / 100;
   const dailyBuybackPressure = dailyFees * ((token?.feeDistribution?.burnPct || 50) / 100);
   const burnVelocity = price > 0 && supply > 0 ? (((dailyBuybackPressure / price) / supply) * 100) : 0;
+  const burnShare = (token?.feeDistribution?.burnPct || 50) / 100;
+  const totalRevenue = Math.max(
+    Math.round(burnedUsd / (burnShare > 0 ? burnShare : 1)),
+    Math.round(dailyFees * 12)
+  );
 
   return (
     <div className="space-y-8">
@@ -33,6 +38,8 @@ export function OverviewPage({ token, onNavigate }) {
         burnedUsd={burnedUsd}
         supply={supply}
         burnWalletPending={burnWalletPending}
+        dailyFees={dailyFees}
+        totalRevenue={totalRevenue}
       />
 
       {/* 2. Bullish Scorecard */}
