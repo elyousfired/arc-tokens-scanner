@@ -127,9 +127,13 @@ export function RecentBurnsTable({ token, burnWallet, onNavigate }) {
     setTimeout(() => setCopiedTx(null), 2000);
   };
 
+  const tokenSpecificBurns = liveBurns.filter(
+    (b) => b.contract?.toLowerCase() === token?.contract?.toLowerCase()
+  );
+
   const displayBurns =
     filter === "token"
-      ? tokenVerifiedBurns
+      ? (tokenSpecificBurns.length > 0 ? tokenSpecificBurns : tokenVerifiedBurns)
       : liveBurns.length > 0
       ? liveBurns.slice(0, 10)
       : tokenVerifiedBurns;

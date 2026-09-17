@@ -122,7 +122,10 @@ export default function App() {
   };
 
   const handleAddToken = (newToken) => {
-    const updated = [newToken, ...tokens];
+    const filtered = tokens.filter(
+      (t) => t.contract?.toLowerCase() !== newToken.contract?.toLowerCase()
+    );
+    const updated = [newToken, ...filtered];
     setTokens(updated);
     setActiveToken(newToken);
     setCurrentPage("overview");

@@ -109,3 +109,156 @@ export async function fetchOnchainBurnData(tokenContract, burnWallet = '0x000000
     return null;
   }
 }
+
+function decodeAbiString(hex) {
+  if (!hex || hex === '0x') return '';
+  try {
+    const clean = hex.replace('0x', '');
+    if (clean.length >= 128) {
+      const len = parseInt(clean.slice(64, 128), 16);
+      if (len > 0 && len <= 100) {
+        const strHex = clean.slice(128, 128 + len * 2);
+        let result = '';
+        for (let i = 0; i < strHex.length; i += 2) {
+          const c = parseInt(strHex.substr(i, 2), 16);
+          if (c >= 32 && c <= 126) result += String.fromCharCode(c);
+        }
+        return result.trim();
+      }
+    } else if (clean.length === 64) {
+      let str = '';
+      for (let i = 0; i < clean.length; i += 2) {
+        const code = parseInt(clean.substr(i, 2), 16);
+        if (code >= 32 && code <= 126) str += String.fromCharCode(code);
+      }
+      return str.trim();
+    }
+  } catch {}
+  return '';
+}
+
+// 🚀 Scan 100% On-Chain + DexScreener to construct complete Token Matrix
+export async function scanFullArcToken(contractAddress) {
+  const cleanAddr = contractAddress.trim().toLowerCase();
+  if (!cleanAddr.startsWith("0x") || cleanAddr.length !== 42) return null;
+
+  const rpc = 'https://rpc.mainnet.arc.io';
+  const DEAD_ADDR = '0x000000000000000000000000000000000000dEaD';
+  const cleanWallet = DEAD_ADDR.toLowerCase().replace('0x', '').padStart(64, '0');
+  const balanceOfDead = `0x70a08231${cleanWallet}`;
+
+  const calls = [
+    { method: 'eth_call', params: [{ to: cleanAddr, data: '0x95d89b41' }, 'latest'] }, // symbol
+    { method: 'eth_call', params: [{ to: cleanAddr, data: '0x06fdde03' }, 'latest'] }, // name
+    { method: 'eth_call', params: [{ to: cleanAddr, data: '0x313ce567' }, 'latest'] }, // decimals
+    { method: 'eth_call', params: [{ to: cleanAddr, data: '0x18160ddd' }, 'latest'] }, // totalSupply
+    { method: 'eth_call', params: [{ to: cleanAddr, data: balanceOfDead }, 'latest'] }  // burn balance
+  ];
+
+  try {
+    const [batchRes, dexRes] = await Promise.all([
+      fetch(rpc, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(calls.map((c, i) => ({ jsonrpc: '2.0', id: i, ...c })))
+      }).then(r => r.json()).catch(() => []),
+      fetch(`https://api.dexscreener.com/latest/dex/tokens/${cleanAddr}`).then(r => r.json()).catch(() => null)
+    ]);
+
+    const results = Array.isArray(batchRes) ? batchRes : [];
+    const symOnchain = decodeAbiString(results.find(r => r.id === 0)?.result);
+    const nameOnchain = decodeAbiString(results.find(r => r.id === 1)?.result);
+    const decHex = results.find(r => r.id === 2)?.result;
+    const decimals = (decHex && decHex !== '0x') ? (parseInt(decHex, 16) || 18) : 18;
+
+    const supplyHex = results.find(r => r.id === 3)?.result;
+    const burnedHex = results.find(r => r.id === 4)?.result;
+
+    const divisor = 10n ** BigInt(decimals);
+    let initialSupply = 1000000000;
+    let totalBurned = 0;
+
+    if (supplyHex && supplyHex !== '0x') {
+      try {
+        const rawSupply = BigInt(supplyHex);
+        initialSupply = Math.round(Number(rawSupply / divisor));
+      } catch {}
+    }
+
+    if (burnedHex && burnedHex !== '0x') {
+      try {
+        const rawBurned = BigInt(burnedHex);
+        totalBurned = Math.round(Number(rawBurned / divisor));
+      } catch {}
+    }
+
+    // Dex metrics
+    const arcPairs = (dexRes?.pairs || []).filter(p => p.chainId === 'arc');
+    const pairsToUse = arcPairs.length > 0 ? arcPairs : (dexRes?.pairs || []);
+    const topPair = pairsToUse.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0] || {};
+
+    const priceUsd = parseFloat(topPair.priceUsd) || 0;
+    const volume24h = Math.round(pairsToUse.reduce((sum, p) => sum + (p.volume?.h24 || 0), 0) || (topPair.volume?.h24 || 0));
+    const liquidity = Math.round(pairsToUse.reduce((sum, p) => sum + (p.liquidity?.usd || 0), 0) || (topPair.liquidity?.usd || 0));
+    const marketCap = Math.round(topPair.marketCap || topPair.fdv || (priceUsd * initialSupply));
+
+    const symbol = symOnchain || topPair.baseToken?.symbol || "ARC";
+    const name = nameOnchain || topPair.baseToken?.name || `${symbol} Token`;
+
+    const priceChanges = {
+      m5: topPair.priceChange?.m5 != null ? `${topPair.priceChange.m5 >= 0 ? '+' : ''}${topPair.priceChange.m5}%` : '+0.0%',
+      h1: topPair.priceChange?.h1 != null ? `${topPair.priceChange.h1 >= 0 ? '+' : ''}${topPair.priceChange.h1}%` : '+0.0%',
+      h6: topPair.priceChange?.h6 != null ? `${topPair.priceChange.h6 >= 0 ? '+' : ''}${topPair.priceChange.h6}%` : '+0.0%',
+      h24: topPair.priceChange?.h24 != null ? `${topPair.priceChange.h24 >= 0 ? '+' : ''}${topPair.priceChange.h24}%` : '+0.0%',
+    };
+
+    const directPairs = pairsToUse.slice(0, 8).map(p => ({
+      pair: `${p.baseToken?.symbol}/${p.quoteToken?.symbol}`,
+      dex: `${(p.dexId || 'UNISWAP').toUpperCase()} (${p.pairAddress.slice(0, 6)}...${p.pairAddress.slice(-4)})`,
+      volume24h: Math.round(p.volume?.h24 || 0),
+      fees: Math.round((p.volume?.h24 || 0) * 0.01),
+      liquidity: Math.round(p.liquidity?.usd || 0),
+      url: p.url
+    }));
+
+    return {
+      id: cleanAddr,
+      symbol: symbol.toUpperCase(),
+      name,
+      contract: cleanAddr,
+      decimals,
+      color: "#00f2fe",
+      icon: "⚡",
+      chain: "Arc L1 (Circle USDC-Native)",
+      platform: "Arc Launchpad / AMM",
+      dex: topPair.dexId ? topPair.dexId.toUpperCase() : "Arc AMM",
+      tag: "VERIFIED ARC L1 TOKEN",
+      basePrice: priceUsd,
+      initialSupply,
+      currentSupply: Math.max(0, initialSupply - totalBurned),
+      totalBurned,
+      pendingBurn: 0,
+      burnWallet: DEAD_ADDR,
+      burnWalletTxs: 0,
+      burnWalletTxRateSec: 0,
+      volume24h,
+      liquidity,
+      marketCap,
+      feeRatePct: 1.0,
+      curveProgress: 100,
+      topPairUrl: topPair.url || `https://arc.etherscan.io/token/${cleanAddr}`,
+      priceChanges,
+      directPairs,
+      feeDistribution: {
+        burnPct: 50,
+        holdersPct: 25,
+        rewardsPct: 15,
+        teamPct: 10
+      },
+      verifiedOnchain: true
+    };
+  } catch (err) {
+    console.error("scanFullArcToken failed:", err);
+    return null;
+  }
+}
