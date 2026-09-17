@@ -21,13 +21,28 @@ export function RewardsPage({ token }) {
   const holdingValue = holdingAmount * price;
   const apy = holdingValue > 0 ? (annualPayout / holdingValue) * 100 : 0;
 
-  const payoutsHistory = [
-    { date: "Day -4", payout: dailyPool * 0.85 },
-    { date: "Day -3", payout: dailyPool * 0.92 },
-    { date: "Day -2", payout: dailyPool * 1.15 },
-    { date: "Day -1", payout: dailyPool * 1.04 },
-    { date: "Today", payout: dailyPool },
-  ];
+  const payoutsHistory = React.useMemo(() => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const now = new Date();
+    const factors = [0.85, 0.92, 1.15, 1.04];
+    const history = [];
+
+    for (let i = 4; i >= 1; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const factor = factors[4 - i] || 1.0;
+      history.push({
+        date: `${months[d.getUTCMonth()]} ${d.getUTCDate()}`,
+        payout: Math.round(dailyPool * factor),
+      });
+    }
+
+    history.push({
+      date: `${months[now.getUTCMonth()]} ${now.getUTCDate()} (Today)`,
+      payout: Math.round(dailyPool),
+    });
+
+    return history;
+  }, [dailyPool]);
 
   return (
     <div className="space-y-6">
@@ -150,7 +165,7 @@ export function RewardsPage({ token }) {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={payoutsHistory}>
               <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
-              <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `$${Math.round(v / 1000)}k`} tickLine={false} />
+              <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => fmtCompact(v)} tickLine={false} />
               <Tooltip
                 contentStyle={{ backgroundColor: "#111622", borderColor: "#334155", borderRadius: "8px", fontSize: "12px" }}
                 formatter={(v) => [`$${Number(v).toLocaleString()} USDC`, "Holder Distribution"]}

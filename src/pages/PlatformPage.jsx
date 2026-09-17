@@ -9,13 +9,30 @@ export function PlatformPage({ token }) {
   const dailyFees = (totalVol * (token?.feeRatePct || 1.0)) / 100;
   const burnPct = (token?.feeDistribution?.burnPct || 50) / 100;
 
-  const dailyRevenueHistory = [
-    { date: "Day -4", revenue: dailyFees * 0.82, buybacks: dailyFees * 0.82 * burnPct },
-    { date: "Day -3", revenue: dailyFees * 0.90, buybacks: dailyFees * 0.90 * burnPct },
-    { date: "Day -2", revenue: dailyFees * 1.12, buybacks: dailyFees * 1.12 * burnPct },
-    { date: "Day -1", revenue: dailyFees * 1.05, buybacks: dailyFees * 1.05 * burnPct },
-    { date: "Today", revenue: Math.round(dailyFees), buybacks: Math.round(dailyFees * burnPct) },
-  ];
+  const dailyRevenueHistory = React.useMemo(() => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const now = new Date();
+    const factors = [0.82, 0.90, 1.12, 1.05];
+    const history = [];
+
+    for (let i = 4; i >= 1; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const factor = factors[4 - i] || 1.0;
+      history.push({
+        date: `${months[d.getUTCMonth()]} ${d.getUTCDate()}`,
+        revenue: Math.round(dailyFees * factor),
+        buybacks: Math.round(dailyFees * factor * burnPct),
+      });
+    }
+
+    history.push({
+      date: `${months[now.getUTCMonth()]} ${now.getUTCDate()} (Today)`,
+      revenue: Math.round(dailyFees),
+      buybacks: Math.round(dailyFees * burnPct),
+    });
+
+    return history;
+  }, [dailyFees, burnPct]);
 
   return (
     <div className="space-y-8">
@@ -102,7 +119,7 @@ export function PlatformPage({ token }) {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={dailyRevenueHistory}>
               <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
-              <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `$${Math.round(v / 1000)}k`} tickLine={false} />
+              <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => fmtCompact(v)} tickLine={false} />
               <Tooltip
                 contentStyle={{ backgroundColor: "#111622", borderColor: "#334155", borderRadius: "8px", fontSize: "12px" }}
                 formatter={(v, name) => [`$${Number(v).toLocaleString()} USDC`, name === "revenue" ? "Protocol Revenue" : "Buybacks & Burns"]}

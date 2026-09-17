@@ -116,7 +116,7 @@ export function DailyBuybacksChart({
             <YAxis
               stroke="#64748b"
               fontSize={11}
-              tickFormatter={(v) => `$${Math.round(v / 1000)}k`}
+              tickFormatter={(v) => fmtCompact(v)}
               tickLine={false}
             />
             <Tooltip
