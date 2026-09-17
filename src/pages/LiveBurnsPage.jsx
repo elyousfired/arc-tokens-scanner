@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
 import { 
   Flame, RefreshCw, ExternalLink, Copy, Check, Search, ShieldCheck, 
-  Trophy, TrendingUp, Filter, BarChart3, ArrowUpRight, Zap 
+  Trophy, TrendingUp, Filter, BarChart3, ArrowUpRight, Zap,
+  AlertTriangle, Droplets, Info
 } from "lucide-react";
 import { scanDeadWalletBurns } from "../services/burnScannerService";
 import { fmtCompact, fmtNum } from "../lib/format";
@@ -158,12 +158,29 @@ export const TOP_BURN_LEADERBOARD = [
     volume24h: 2479309,
     tag: "Bonding Curve Graduation",
     pairUrl: "https://dexscreener.com/arc/0x507a494fde26960cb36d50912cab83c71ecc7ea7"
+  },
+  {
+    rank: 11,
+    symbol: "ELLIPSE",
+    name: "Ellipse Protocol",
+    contract: "0x86f7424c3e1ebb3f42e1e687468e36d5f2a1222e",
+    burnedTokens: 17249297,
+    burnUsd: 3402,
+    priceUsd: 0.0001972,
+    totalSupply: 1000000000,
+    burnedPct: 1.72,
+    liquidity: 171774,
+    volume24h: 1412758,
+    tag: "AMM Deep Liquidity",
+    pairUrl: "https://dexscreener.com/arc/0x0abd501f56cd434d346cd5bf3b67aef461ebbc2d"
   }
 ];
 
 export function LiveBurnsPage({ token, allTokens = [], onSelectToken }) {
   const [activeTab, setActiveTab] = useState("top10"); // "top10" | "stream"
   const [leaderboardSort, setLeaderboardSort] = useState("usd"); // "usd" | "pct" | "tokens"
+  const [liquidityFilter, setLiquidityFilter] = useState("all"); // "all" | "liquid"
+  const [showExplainer, setShowExplainer] = useState(true);
   const [burns, setBurns] = useState([]);
   const [currentBlock, setCurrentBlock] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -218,19 +235,22 @@ export function LiveBurnsPage({ token, allTokens = [], onSelectToken }) {
     setTimeout(() => setCopiedTx(null), 2000);
   };
 
-  // Sort Leaderboard
-  const sortedLeaderboard = [...TOP_BURN_LEADERBOARD]
-    .filter(
-      (t) =>
+  // Sort & Filter Leaderboard
+  const filteredLeaderboard = [...TOP_BURN_LEADERBOARD]
+    .filter((t) => {
+      const matchesSearch =
         t.symbol?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.contract?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (leaderboardSort === "pct") return b.burnedPct - a.burnedPct;
-      if (leaderboardSort === "tokens") return b.burnedTokens - a.burnedTokens;
-      return b.burnUsd - a.burnUsd;
+        t.contract?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesLiquidity = liquidityFilter === "liquid" ? t.liquidity >= 5000 : true;
+      return matchesSearch && matchesLiquidity;
     });
+
+  const sortedLeaderboard = filteredLeaderboard.sort((a, b) => {
+    if (leaderboardSort === "pct") return b.burnedPct - a.burnedPct;
+    if (leaderboardSort === "tokens") return b.burnedTokens - a.burnedTokens;
+    return b.burnUsd - a.burnUsd;
+  });
 
   // Filter Stream
   const filteredStream = burns.filter(
@@ -240,7 +260,7 @@ export function LiveBurnsPage({ token, allTokens = [], onSelectToken }) {
       b.tx?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalLeaderboardBurnUsd = TOP_BURN_LEADERBOARD.reduce((acc, t) => acc + t.burnUsd, 0);
+  const totalLeaderboardBurnUsd = filteredLeaderboard.reduce((acc, t) => acc + t.burnUsd, 0);
 
   return (
     <div className="space-y-6 animate-fadeIn pb-16">
@@ -398,28 +418,97 @@ export function LiveBurnsPage({ token, allTokens = [], onSelectToken }) {
       {/* TAB 1: TOP 10 LEADERBOARD */}
       {activeTab === "top10" && (
         <div className="space-y-4">
-          {/* Sub-sort bar for Leaderboard */}
-          <div className="flex items-center gap-2 text-xs font-mono">
-            <span className="text-slate-500 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5" /> Rank by:
-            </span>
-            {[
-              { key: "usd", label: "💰 Highest USD Value ($)" },
-              { key: "tokens", label: "🔥 Most Tokens Burned" },
-              { key: "pct", label: "📊 Highest % Supply Burned" },
-            ].map((s) => (
+          {/* Liquidity filter & Sub-sort bar */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-xs font-mono">
+            {/* Filter by Liquidity */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-slate-500 flex items-center gap-1">
+                <Droplets className="w-3.5 h-3.5 text-cyan-400" /> Pool Filter:
+              </span>
               <button
-                key={s.key}
-                onClick={() => setLeaderboardSort(s.key)}
+                onClick={() => setLiquidityFilter("all")}
                 className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
-                  leaderboardSort === s.key
-                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold"
+                  liquidityFilter === "all"
+                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold"
                     : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
                 }`}
               >
-                {s.label}
+                🌐 All Tokens (Include $0 Curves)
               </button>
-            ))}
+              <button
+                onClick={() => setLiquidityFilter("liquid")}
+                className={`px-3 py-1.5 rounded-md transition cursor-pointer flex items-center gap-1.5 ${
+                  liquidityFilter === "liquid"
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold shadow-lg shadow-emerald-500/10"
+                    : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>💧 Verified Liquid Pools Only (&gt; $5K Liq)</span>
+              </button>
+            </div>
+
+            {/* Rank by Sort */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-slate-500 flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5" /> Rank by:
+              </span>
+              {[
+                { key: "usd", label: "💰 USD Value" },
+                { key: "tokens", label: "🔥 Token Count" },
+                { key: "pct", label: "📊 % Supply Cut" },
+              ].map((s) => (
+                <button
+                  key={s.key}
+                  onClick={() => setLeaderboardSort(s.key)}
+                  className={`px-3 py-1.5 rounded-md transition cursor-pointer ${
+                    leaderboardSort === s.key
+                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold"
+                      : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Educational Explainer Banner */}
+          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs font-mono space-y-2">
+            <div className="flex items-center justify-between font-bold text-amber-300">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <span>Wach 95% - 97% Burn Logique ? (Real Buybacks vs Bonding Curve Sweeps)</span>
+              </div>
+              <button
+                onClick={() => setShowExplainer(!showExplainer)}
+                className="text-[11px] underline text-amber-400 hover:text-amber-200 cursor-pointer"
+              >
+                {showExplainer ? "Masquer ▲" : "Afficher l'explication ▼"}
+              </button>
+            </div>
+
+            {showExplainer && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 text-[11px] text-slate-300">
+                <div className="p-3 rounded-lg bg-[#0b1320] border border-emerald-500/30">
+                  <div className="font-bold text-emerald-400 flex items-center gap-1.5 mb-1 text-xs">
+                    <span>✅ Real AMM Fee Buybacks (ex: ARGUS, TOLLY)</span>
+                  </div>
+                  <p className="leading-relaxed text-slate-300">
+                    Smart contracts li kaysta3mlo l-fees dyal trading b USDC bach ychriw les tokens mn l-market f DEX w kay7ar9ohom f 0x00...dEaD. Kayna Liquidity s7i7a ($1.85M f ARGUS), donc l-valeur dyal l-burn <strong>100% 7a9i9iya w liquide</strong>.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-[#140e1a] border border-amber-500/30">
+                  <div className="font-bold text-amber-400 flex items-center gap-1.5 mb-1 text-xs">
+                    <span>⚠️ Bonding Curve Sweeps / Unsold (ex: AI, SPECSY)</span>
+                  </div>
+                  <p className="leading-relaxed text-slate-300">
+                    Tokens mintés f Launchpad b 1 Milliard supply. Mli katba3 ghir ~4% f l-curve, dakchi li b9a (95.78%) kaysiftoha direct l 0x00...dEaD. <strong>Ila kant l-liquidity $0</strong>, darba f akhar spot price kat3ti <strong>Paper Value</strong> (valeur théorique f l-wraq li ma t9darch tbi3ha).
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="card border-slate-800 bg-[#111622] overflow-hidden shadow-2xl">
@@ -472,9 +561,18 @@ export function LiveBurnsPage({ token, allTokens = [], onSelectToken }) {
                         </td>
 
                         <td className="py-3.5 px-4 text-right">
-                          <div className="font-black text-sm text-emerald-400">
+                          <div className={`font-black text-sm ${t.liquidity === 0 ? "text-slate-400 line-through decoration-rose-500/60" : "text-emerald-400"}`}>
                             ${t.burnUsd.toLocaleString()}
                           </div>
+                          {t.liquidity === 0 ? (
+                            <div className="text-[10px] text-rose-400 flex items-center justify-end gap-1 font-sans">
+                              <span>⚠️ Paper Value</span>
+                            </div>
+                          ) : (
+                            <div className="text-[10px] text-emerald-400/80 font-sans">
+                              Real Buyback
+                            </div>
+                          )}
                         </td>
 
                         <td className="py-3.5 px-4 text-right font-bold text-slate-100">
@@ -504,8 +602,21 @@ export function LiveBurnsPage({ token, allTokens = [], onSelectToken }) {
                           ${fmtNum(t.priceUsd, 6)}
                         </td>
 
-                        <td className="py-3.5 px-4 text-right text-slate-300">
-                          ${fmtCompact(t.liquidity)}
+                        <td className="py-3.5 px-4 text-right">
+                          {t.liquidity === 0 ? (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-950/60 border border-rose-800/60 px-2 py-0.5 rounded">
+                              $0 (Paper Val)
+                            </span>
+                          ) : (
+                            <div>
+                              <div className="font-bold text-slate-200">
+                                ${fmtCompact(t.liquidity)}
+                              </div>
+                              <div className="text-[10px] text-emerald-400">
+                                {t.liquidity >= 100000 ? "Deep Pool" : "Active Pool"}
+                              </div>
+                            </div>
+                          )}
                         </td>
 
                         <td className="py-3.5 px-4 text-right">
