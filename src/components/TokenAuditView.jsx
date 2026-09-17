@@ -16,7 +16,12 @@ import {
   Activity,
   Download,
   Layers,
-  Share2
+  Share2,
+  Globe,
+  MessageCircle,
+  Key,
+  X,
+  Bot
 } from "lucide-react";
 import { auditArcToken } from "../services/tokenAuditService";
 import { scanFullArcToken } from "../services/dexService";
@@ -27,6 +32,16 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
   const [audit, setAudit] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Optional Gemini API Key
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [geminiKey, setGeminiKey] = useState(() => {
+    try {
+      return localStorage.getItem("arc_gemini_api_key") || "";
+    } catch {
+      return "";
+    }
+  });
 
   const sampleTokens = [
     { label: "$ARGUS", addr: "0xece5ca8bf9220718e5727754026757512212cb3c" },
@@ -42,7 +57,6 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
 
     setLoading(true);
     try {
-      // 1. Check if it's already in memory or scan full on-chain
       let current = allTokens?.find(t => t.contract?.toLowerCase() === targetAddr.toLowerCase());
       if (!current) {
         current = await scanFullArcToken(targetAddr);
@@ -74,6 +88,16 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleSaveApiKey = (val) => {
+    setGeminiKey(val);
+    try {
+      if (val) localStorage.setItem("arc_gemini_api_key", val.trim());
+      else localStorage.removeItem("arc_gemini_api_key");
+    } catch {}
+    setShowApiKeyModal(false);
+    if (searchAddr) runAudit(searchAddr);
+  };
+
   const handleDownloadReport = () => {
     window.print();
   };
@@ -92,26 +116,36 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-mono font-semibold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
-              <span>Arc L1 On-Chain Intelligence Terminal</span>
+              <Bot className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
+              <span>Autonomous AI On-Chain & Web Crawler</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
               AI Token Research & Success Probability Engine
             </h1>
             <p className="text-slate-400 text-sm max-w-2xl">
-              Audit instantané et approfondi de n'importe quel token Arc L1 : décomposition des frais, modèle anti-dump créateur, calcul algorithmique du score de viabilité (0-100%) et schéma du mécanisme économique.
+              Le système explore de façon autonome le site officiel du token, inspecte les smart contracts sur Arc L1, et modélise en temps réel le schéma de redistribution des capitaux et le score de viabilité (0-100%).
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              onClick={() => setShowApiKeyModal(true)}
+              className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-900 border border-purple-500/30 text-purple-300 hover:bg-purple-950/40 text-xs font-mono font-semibold transition cursor-pointer"
+              title="Ajouter votre clé Google Gemini gratuite pour un audit par LLM en direct"
+            >
+              <Key className="w-3.5 h-3.5 text-purple-400" />
+              <span>{geminiKey ? "Gemini Pro Active ✨" : "AI Key (Optional)"}</span>
+            </button>
+
             <button
               onClick={handleDownloadReport}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition shadow-lg cursor-pointer"
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition shadow-lg cursor-pointer"
               title="Exporter le rapport d'audit au format imprimable"
             >
               <Download className="w-4 h-4 text-cyan-400" />
-              <span>Print / Save PDF</span>
+              <span>Print PDF</span>
             </button>
+
             {tokenData && (
               <button
                 onClick={() => {
@@ -120,7 +154,7 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
                 }}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold transition shadow-lg shadow-cyan-500/20 cursor-pointer"
               >
-                <span>Full Matrix Overview</span>
+                <span>Overview Matrix</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
@@ -144,7 +178,7 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
               disabled={loading || !searchAddr}
               className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-bold text-xs rounded-lg transition cursor-pointer"
             >
-              {loading ? "Scanning..." : "Audit"}
+              {loading ? "Crawling..." : "Audit"}
             </button>
           </div>
 
@@ -171,11 +205,66 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
         </div>
       </div>
 
+      {/* API Key Modal */}
+      {showApiKeyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="w-full max-w-md p-6 rounded-2xl bg-[#0f1422] border border-purple-500/40 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-400" />
+                <span>Google Gemini API Key (Optional)</span>
+              </h3>
+              <button
+                onClick={() => setShowApiKeyModal(false)}
+                className="text-slate-400 hover:text-white p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Le crawler autonome fonctionne déjà par défaut sans aucune clé. Vous pouvez toutefois renseigner une clé gratuite Google Gemini pour activer la génération de contenu par intelligence artificielle avancée.
+            </p>
+            <input
+              type="password"
+              value={geminiKey}
+              onChange={(e) => setGeminiKey(e.target.value)}
+              placeholder="AIzaSy..."
+              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-purple-400"
+            />
+            <div className="flex items-center justify-between pt-2">
+              <a
+                href="https://aistudio.google.com/app/apikey"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-cyan-400 hover:underline flex items-center gap-1"
+              >
+                <span>Get Free Key at Google AI Studio</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleSaveApiKey("")}
+                  className="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white"
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={() => handleSaveApiKey(geminiKey)}
+                  className="px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold"
+                >
+                  Save & Apply
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading && (
         <div className="py-16 text-center space-y-4">
           <div className="inline-block w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-400 rounded-full animate-spin" />
           <p className="text-sm font-mono text-cyan-400 animate-pulse">
-            Inspection On-Chain RPC · Détection Bytecode · Calcul du Score de Probabilité...
+            🤖 Agent IA en cours d'exploration du site officiel & des Smart Contracts Arc L1...
           </p>
         </div>
       )}
@@ -205,7 +294,6 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
               <div className="py-6 flex flex-col items-center justify-center">
                 <div className="relative w-36 h-36 flex items-center justify-center">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    {/* Background circle */}
                     <circle
                       cx="50"
                       cy="50"
@@ -214,7 +302,6 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
                       strokeWidth="8"
                       fill="transparent"
                     />
-                    {/* Dynamic progress circle */}
                     <circle
                       cx="50"
                       cy="50"
@@ -244,8 +331,17 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
                 </div>
               </div>
 
+              {/* Active Engine Badge */}
+              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between text-xs font-mono">
+                <span className="text-slate-400">Analysis Engine:</span>
+                <span className="text-purple-300 font-bold flex items-center gap-1.5">
+                  <Bot className="w-3.5 h-3.5 text-purple-400" />
+                  <span>{audit.engine}</span>
+                </span>
+              </div>
+
               {/* Verdict paragraph */}
-              <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+              <div className="p-3.5 mt-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300 leading-relaxed">
                 <span className="text-cyan-400 font-bold">Diagnostic : </span>
                 {audit.tier.verdict}
               </div>
@@ -255,12 +351,37 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
             <div className="lg:col-span-7 bg-[#0f1523] border border-slate-800/90 rounded-2xl p-6 flex flex-col justify-between shadow-xl space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h2 className="text-xl font-extrabold text-white tracking-tight">${audit.symbol}</h2>
                     <span className="text-xs text-slate-400">{audit.name}</span>
                     <span className="px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-mono font-semibold">
                       Arc L1
                     </span>
+
+                    {/* Official Website / Socials */}
+                    {audit.websiteUrl && (
+                      <a
+                        href={audit.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono font-bold hover:bg-emerald-900/40 transition"
+                      >
+                        <Globe className="w-3 h-3" />
+                        <span>Site Officiel</span>
+                        <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
+                    )}
+                    {audit.twitterUrl && (
+                      <a
+                        href={audit.twitterUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-sky-950/60 border border-sky-500/40 text-sky-300 text-[10px] font-mono font-bold hover:bg-sky-900/40 transition"
+                      >
+                        <span>Twitter / X</span>
+                        <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-[11px] font-mono text-slate-400 truncate max-w-[220px] sm:max-w-xs">
@@ -349,12 +470,12 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
             </div>
           </div>
 
-          {/* Interactive Flywheel & Economic Flowchart (Schema bhal l-PDF!) */}
+          {/* Dynamic Flywheel & Economic Flowchart (Schema bhal l-PDF!) */}
           <div className="bg-[#0f1523] border border-slate-800/90 rounded-2xl p-6 shadow-xl space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-4">
               <div>
                 <div className="text-[11px] font-mono text-cyan-400 uppercase font-semibold">
-                  Mécanisme & Schéma Économique
+                  Mécanisme & Schéma Économique Personnalisé
                 </div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <Zap className="w-4 h-4 text-cyan-400" />

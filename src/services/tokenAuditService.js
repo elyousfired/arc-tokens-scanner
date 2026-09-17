@@ -26,15 +26,39 @@ export async function auditArcToken(tokenData) {
   const burnPct = initialSupply > 0 ? (totalBurned / initialSupply) * 100 : 0;
   const priceChange24h = parseFloat(tokenData.priceChanges?.h24 || 0);
 
+  // 0. Live AI Agent Web Crawler Query (/api/ai-research)
+  let liveAi = null;
+  try {
+    const geminiKey = typeof localStorage !== 'undefined' ? (localStorage.getItem('arc_gemini_api_key') || '') : '';
+    const headers = geminiKey ? { 'x-gemini-key': geminiKey } : {};
+    const aiRes = await fetch(`/api/ai-research?address=${addr}`, {
+      headers,
+      signal: AbortSignal.timeout(5000)
+    });
+    if (aiRes.ok) {
+      liveAi = await aiRes.json();
+    }
+  } catch (e) {
+    // Graceful fallback to on-chain heuristics
+  }
+
   // 1. Check Ecosystem Origin & Known Protocol Footprint
-  let ecosystemType = "Arc Standard AMM (Uniswap / Camelot V2 Fork)";
-  let feeMechanism = "0.30% standard swap fee to Liquidity Providers";
+  let ecosystemType = liveAi?.analysis?.category || "Arc Standard AMM (Uniswap / Camelot V2 Fork)";
+  let feeMechanism = liveAi?.analysis?.summary || "0.30% standard swap fee to Liquidity Providers";
   let isZyora = false;
   let isZyoraDN404 = false;
 
   let flowchart = null;
+  if (liveAi?.analysis?.streams && liveAi.analysis.streams.length > 0) {
+    flowchart = {
+      protocolTitle: liveAi.analysis.category || `${symbol} Verified Protocol`,
+      feeRate: liveAi.analysis.feeRate || "1.00%",
+      legAsset: "Native USDC / Arc AMM",
+      streams: liveAi.analysis.streams
+    };
+  }
 
-  if (addr === KNOWN_FACTORIES.ZYORA_TOKEN || name.toLowerCase().includes("zyora") || symbol.includes("ZYORA")) {
+  if (!flowchart && (addr === KNOWN_FACTORIES.ZYORA_TOKEN || name.toLowerCase().includes("zyora") || symbol.includes("ZYORA"))) {
     ecosystemType = "Zyora Native Protocol Token";
     feeMechanism = "1.00% Protocol Fee · 65% Creator Cash (USDC) · 20% Treasury · 7.5% ZYRALS Pot · 5% Systematic Buyback & Burn";
     isZyora = true;
@@ -342,6 +366,11 @@ Le token $${symbol} (${name}) opère sur le réseau Arc L1 (Chain ID 5042) avec 
     totalScore,
     tier,
     flowchart,
+    websiteUrl: liveAi?.websiteUrl || null,
+    twitterUrl: liveAi?.twitterUrl || null,
+    telegramUrl: liveAi?.telegramUrl || null,
+    engine: liveAi?.engine || "Autonomous On-Chain Crawler & Pattern Engine",
+    scraped: liveAi?.scraped || false,
     breakdown: {
       liquidity: { score: liquidityScore, max: 25, label: "Santé & Profondeur Liquidité", comment: liquidityComment },
       burn: { score: burnScore, max: 20, label: "Dynamique de Burn Déflationniste", comment: burnComment },
