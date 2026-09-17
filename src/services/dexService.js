@@ -1,4 +1,5 @@
 // Arc L1 DEX & On-Chain Live Services
+import { findTokenCreator, getArcUsdcBalance } from "./revenueService";
 
 export async function fetchLiveTokenData(contractAddress) {
   try {
@@ -221,11 +222,23 @@ export async function scanFullArcToken(contractAddress) {
       url: p.url
     }));
 
+    let creatorWallet = null;
+    let creatorBalanceUsd = 0;
+    try {
+      const creator = await findTokenCreator(cleanAddr);
+      if (creator?.address) {
+        creatorWallet = creator.address;
+        creatorBalanceUsd = Math.round(await getArcUsdcBalance(creator.address));
+      }
+    } catch {}
+
     return {
       id: cleanAddr,
       symbol: symbol.toUpperCase(),
       name,
       contract: cleanAddr,
+      creatorWallet,
+      creatorBalanceUsd,
       decimals,
       color: "#00f2fe",
       icon: "⚡",
