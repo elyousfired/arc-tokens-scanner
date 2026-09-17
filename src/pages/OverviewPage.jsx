@@ -7,6 +7,7 @@ import { DailyBuybacksChart } from "../components/DailyBuybacksChart";
 import { RecentBurnsTable } from "../components/RecentBurnsTable";
 import { FlywheelSimulator } from "../components/FlywheelSimulator";
 import { TradingPairsTable } from "../components/TradingPairsTable";
+import { RevenueVaultsCard } from "../components/RevenueVaultsCard";
 
 export function OverviewPage({ token, onNavigate }) {
   const price = token?.basePrice || 0;
@@ -79,6 +80,9 @@ export function OverviewPage({ token, onNavigate }) {
         currentPrice={price}
         priceChange={priceChange}
       />
+
+      {/* 3.5. On-Chain Revenue & Creator Earnings Matrix */}
+      <RevenueVaultsCard token={token} />
 
       {/* 4. Timeline Chart & Recent Burns Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" id="burns">
