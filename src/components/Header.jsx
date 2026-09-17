@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Zap, Flame, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check, Clock } from "lucide-react";
+import { Zap, Flame, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check, Clock, Sparkles } from "lucide-react";
 
 export function Header({
   activeToken,
@@ -154,6 +154,20 @@ export function Header({
               <Clock className="w-3.5 h-3.5 text-cyan-400" />
               <span>Fresh Burns (1H-24H)</span>
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            </button>
+
+            <button
+              onClick={() => onNavigate("ai-audit")}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-medium transition cursor-pointer ${
+                currentPage === "ai-audit"
+                  ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold shadow-lg shadow-purple-500/10"
+                  : "text-slate-300 hover:text-white"
+              }`}
+              title="AI On-Chain Token Intelligence & Success Probability Radar"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+              <span>AI Audit Radar</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
             </button>
 
             {/* Platform Dropdown */}
@@ -349,6 +363,16 @@ export function Header({
           >
             <Clock className="w-4 h-4 text-cyan-400" />
             <span>Fresh Burns Radar (1H - 24H)</span>
+          </button>
+          <button
+            onClick={() => {
+              onNavigate("ai-audit");
+              setMobileMenuOpen(false);
+            }}
+            className="flex items-center gap-2 w-full text-left py-1.5 text-purple-400 font-bold"
+          >
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            <span>AI Audit Radar (Success & Flywheel)</span>
           </button>
           <div className="pt-2 border-t border-slate-800/60 text-xs font-bold text-slate-500 uppercase">Platform</div>
           <button

@@ -4,12 +4,14 @@ import {
   ExternalLink, Sparkles, Flame, Droplets, Coins, TrendingUp, ArrowRight, Clipboard
 } from "lucide-react";
 import { scanFullArcToken } from "../services/dexService";
+import { auditArcToken } from "../services/tokenAuditService";
 import { fmtCompact, fmtNum } from "../lib/format";
 
-export function AddTokenModal({ isOpen, onClose, onAddToken }) {
+export function AddTokenModal({ isOpen, onClose, onAddToken, onOpenAudit }) {
   const [address, setAddress] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [tokenResult, setTokenResult] = useState(null);
+  const [auditResult, setAuditResult] = useState(null);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -18,6 +20,7 @@ export function AddTokenModal({ isOpen, onClose, onAddToken }) {
       setAddress("");
       setIsScanning(false);
       setTokenResult(null);
+      setAuditResult(null);
       setError("");
       setCopied(false);
     }
@@ -34,10 +37,13 @@ export function AddTokenModal({ isOpen, onClose, onAddToken }) {
       setError("");
       setIsScanning(true);
       setTokenResult(null);
+      setAuditResult(null);
 
       const result = await scanFullArcToken(clean);
       if (result && result.symbol) {
         setTokenResult(result);
+        const audit = await auditArcToken(result);
+        setAuditResult(audit);
       } else {
         setError("Token not found on Arc L1 or contract did not respond to standard ERC-20 calls.");
       }
@@ -238,6 +244,48 @@ export function AddTokenModal({ isOpen, onClose, onAddToken }) {
                   {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                 </button>
               </div>
+
+              {/* 🎯 AI Viability Score & Mechanism Banner */}
+              {auditResult && (
+                <div className="p-3 rounded-xl bg-purple-950/30 border border-purple-500/30 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-400" />
+                    <div>
+                      <div className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">
+                        AI Success Probability
+                      </div>
+                      <div className="text-xs text-white font-medium truncate max-w-[240px]">
+                        {auditResult.ecosystemType}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="px-2.5 py-1 rounded-md text-xs font-mono font-bold"
+                      style={{
+                        backgroundColor: `${auditResult.tier.color}20`,
+                        color: auditResult.tier.color,
+                        border: `1px solid ${auditResult.tier.color}40`
+                      }}
+                    >
+                      {auditResult.totalScore}% · Grade {auditResult.tier.grade}
+                    </span>
+                    {onOpenAudit && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onOpenAudit(tokenResult);
+                          onClose();
+                        }}
+                        className="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5 font-bold cursor-pointer"
+                      >
+                        <span>Audit Radar</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* 4 Metric Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">

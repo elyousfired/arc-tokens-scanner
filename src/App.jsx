@@ -19,6 +19,7 @@ import { RewardsPage } from "./pages/RewardsPage";
 import { PlatformPage } from "./pages/PlatformPage";
 import { AboutPage } from "./pages/AboutPage";
 import { AllTokensHub } from "./pages/AllTokensHub";
+import { TokenAuditView } from "./components/TokenAuditView";
 
 export default function App() {
   const [tokens, setTokens] = useState(() => {
@@ -195,6 +196,18 @@ export default function App() {
             }}
           />
         );
+      case "ai-audit":
+      case "audit":
+        return (
+          <TokenAuditView
+            activeToken={activeToken}
+            allTokens={tokens}
+            onSelectToken={(t) => {
+              setActiveToken(t);
+            }}
+            onNavigate={setCurrentPage}
+          />
+        );
       default:
         return <OverviewPage token={activeToken} onNavigate={setCurrentPage} />;
     }
@@ -237,6 +250,10 @@ export default function App() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAddToken={handleAddToken}
+        onOpenAudit={(token) => {
+          handleAddToken(token);
+          setCurrentPage("ai-audit");
+        }}
       />
 
       <SwapModal
