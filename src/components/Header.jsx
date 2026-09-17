@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Zap, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check } from "lucide-react";
+import { Zap, Flame, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check } from "lucide-react";
 
 export function Header({
   activeToken,
@@ -126,6 +126,20 @@ export function Header({
               }`}
             >
               ${activeToken?.symbol || "ARGUS"}
+            </button>
+
+            <button
+              onClick={() => onNavigate("burns")}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-medium transition cursor-pointer ${
+                currentPage === "burns"
+                  ? "bg-orange-500/20 text-orange-400 border border-orange-500/30 font-bold"
+                  : "text-slate-300 hover:text-white"
+              }`}
+              title="Arc L1 Dead Wallet Real-Time Burn Scanner"
+            >
+              <Flame className="w-3.5 h-3.5 text-orange-400" />
+              <span>Live Burns</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping" />
             </button>
 
             {/* Platform Dropdown */}
@@ -301,6 +315,16 @@ export function Header({
             className="block w-full text-left py-1.5 text-cyan-400 font-bold"
           >
             ${activeToken?.symbol} (Overview)
+          </button>
+          <button
+            onClick={() => {
+              onNavigate("burns");
+              setMobileMenuOpen(false);
+            }}
+            className="flex items-center gap-2 w-full text-left py-1.5 text-orange-400 font-bold"
+          >
+            <Flame className="w-4 h-4 text-orange-400" />
+            <span>Live Burn Scanner (0x...dEaD)</span>
           </button>
           <div className="pt-2 border-t border-slate-800/60 text-xs font-bold text-slate-500 uppercase">Platform</div>
           <button

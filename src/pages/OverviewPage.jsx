@@ -61,6 +61,7 @@ export function OverviewPage({ token, onNavigate }) {
         <RecentBurnsTable
           token={token}
           burnWallet={token?.burnWallet}
+          onNavigate={onNavigate}
         />
       </div>
 

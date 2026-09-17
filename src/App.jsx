@@ -8,6 +8,7 @@ import { SwapModal } from "./components/SwapModal";
 import { fetchLiveTokenData, fetchOnchainBurnData } from "./services/dexService";
 
 import { OverviewPage } from "./pages/OverviewPage";
+import { LiveBurnsPage } from "./pages/LiveBurnsPage";
 import { FlywheelPage } from "./pages/FlywheelPage";
 import { PairsPage } from "./pages/PairsPage";
 import { TokensPage } from "./pages/TokensPage";
@@ -130,6 +131,17 @@ export default function App() {
     switch (currentPage) {
       case "overview":
         return <OverviewPage token={activeToken} onNavigate={setCurrentPage} />;
+      case "burns":
+        return (
+          <LiveBurnsPage
+            token={activeToken}
+            allTokens={tokens}
+            onSelectToken={(t) => {
+              setActiveToken(t);
+              setCurrentPage("overview");
+            }}
+          />
+        );
       case "flywheel":
         return <FlywheelPage token={activeToken} />;
       case "pairs":
