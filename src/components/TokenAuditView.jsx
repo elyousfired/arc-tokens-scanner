@@ -386,63 +386,48 @@ export function TokenAuditView({ activeToken, allTokens, onSelectToken, onNaviga
                 {/* Step 2: Protocol Fee */}
                 <div className="flex flex-col items-center text-center p-4 rounded-xl bg-slate-900 border border-blue-500/40 w-44 shrink-0 shadow-lg shadow-blue-500/5">
                   <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-2 font-mono font-extrabold text-sm">
-                    1%
+                    {audit.flowchart?.feeRate || "1%"}
                   </div>
-                  <div className="text-xs font-bold text-white">Protocole Arc / Zyora</div>
+                  <div className="text-xs font-bold text-white truncate max-w-[150px]" title={audit.flowchart?.protocolTitle}>
+                    {audit.flowchart?.protocolTitle || "Protocole AMM"}
+                  </div>
                   <div className="text-[10px] text-slate-400 mt-1">Frais de Transaction</div>
-                  <div className="text-[9px] font-mono text-blue-400 mt-1">Native USDC Leg</div>
+                  <div className="text-[9px] font-mono text-blue-400 mt-1">
+                    {audit.flowchart?.legAsset || "Native USDC Leg"}
+                  </div>
                 </div>
 
                 <div className="flex items-center text-blue-400 font-bold text-xs shrink-0">
                   <span>──▶</span>
                 </div>
 
-                {/* Step 3: Distribution Streams */}
-                <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {/* Stream A: Creator */}
-                  <div className="p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/30">
-                    <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
-                      <span>Créateur Token</span>
-                      <span>65.0%</span>
-                    </div>
-                    <div className="text-[10px] text-slate-300 mt-1">Revenu cash USDC (Anti-dump)</div>
-                  </div>
-
-                  {/* Stream B: Platform */}
-                  <div className="p-3 rounded-lg bg-cyan-950/40 border border-cyan-500/30">
-                    <div className="flex items-center justify-between text-xs font-bold text-cyan-400">
-                      <span>Trésorerie</span>
-                      <span>20.0%</span>
-                    </div>
-                    <div className="text-[10px] text-slate-300 mt-1">Développement & Sécurité</div>
-                  </div>
-
-                  {/* Stream C: Buyback & Burn */}
-                  <div className="p-3 rounded-lg bg-orange-950/40 border border-orange-500/30 col-span-2 sm:col-span-1">
-                    <div className="flex items-center justify-between text-xs font-bold text-orange-400">
-                      <span>🔥 Buyback & Burn</span>
-                      <span>5.0%</span>
-                    </div>
-                    <div className="text-[10px] text-slate-300 mt-1">Rachat & Dead Wallet</div>
-                  </div>
-
-                  {/* Stream D: Rewards Pot */}
-                  <div className="p-3 rounded-lg bg-yellow-950/40 border border-yellow-500/30">
-                    <div className="flex items-center justify-between text-xs font-bold text-yellow-400">
-                      <span>Rewards Pot</span>
-                      <span>7.5%</span>
-                    </div>
-                    <div className="text-[10px] text-slate-300 mt-1">Cagnotte ZYRALS / Traders</div>
-                  </div>
-
-                  {/* Stream E: Referrals */}
-                  <div className="p-3 rounded-lg bg-purple-950/40 border border-purple-500/30 col-span-2">
-                    <div className="flex items-center justify-between text-xs font-bold text-purple-400">
-                      <span>Affiliation & Parrainage</span>
-                      <span>2.5%</span>
-                    </div>
-                    <div className="text-[10px] text-slate-300 mt-1">Flux vers les parrains éligibles</div>
-                  </div>
+                {/* Step 3: Dynamic Distribution Streams */}
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {(audit.flowchart?.streams || [
+                    { label: "🔥 Buyback & Burn", pct: "50%", desc: "Incinération Dead Wallet", color: "orange" },
+                    { label: "💰 Holders Payback", pct: "25%", desc: "Redistribution holders", color: "emerald" },
+                    { label: "🏆 Rewards Pot", pct: "15%", desc: "Programme communautaire", color: "yellow" },
+                    { label: "👥 Team & Ops", pct: "10%", desc: "Développement & Croissance", color: "purple" }
+                  ]).map((st, i) => {
+                    const colorStyles = {
+                      emerald: "bg-emerald-950/40 border-emerald-500/30 text-emerald-400",
+                      orange: "bg-orange-950/40 border-orange-500/30 text-orange-400",
+                      cyan: "bg-cyan-950/40 border-cyan-500/30 text-cyan-400",
+                      yellow: "bg-yellow-950/40 border-yellow-500/30 text-yellow-400",
+                      purple: "bg-purple-950/40 border-purple-500/30 text-purple-400",
+                      blue: "bg-blue-950/40 border-blue-500/30 text-blue-400"
+                    };
+                    const styleClass = colorStyles[st.color] || colorStyles.cyan;
+                    return (
+                      <div key={i} className={`p-3 rounded-lg border ${styleClass}`}>
+                        <div className="flex items-center justify-between text-xs font-bold">
+                          <span>{st.label}</span>
+                          <span>{st.pct}</span>
+                        </div>
+                        <div className="text-[10px] text-slate-300 mt-1 leading-tight">{st.desc}</div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

@@ -32,18 +32,101 @@ export async function auditArcToken(tokenData) {
   let isZyora = false;
   let isZyoraDN404 = false;
 
+  let flowchart = null;
+
   if (addr === KNOWN_FACTORIES.ZYORA_TOKEN || name.toLowerCase().includes("zyora") || symbol.includes("ZYORA")) {
     ecosystemType = "Zyora Native Protocol Token";
     feeMechanism = "1.00% Protocol Fee · 65% Creator Cash (USDC) · 20% Treasury · 7.5% ZYRALS Pot · 5% Systematic Buyback & Burn";
     isZyora = true;
+    flowchart = {
+      protocolTitle: "Zyora Launchpad & AMM",
+      feeRate: "1.00%",
+      legAsset: "Native USDC Leg",
+      streams: [
+        { label: "Créateur Token", pct: "65.0%", desc: "Revenu cash USDC (Anti-Dump)", color: "emerald" },
+        { label: "Trésorerie Zyora", pct: "20.0%", desc: "Développement & Sécurité", color: "cyan" },
+        { label: "🔥 Buyback & Burn", pct: "5.0%", desc: "Rachat & Dead Wallet $ZYORA", color: "orange" },
+        { label: "Rewards Pot", pct: "7.5%", desc: "Cagnotte ZYRALS / Traders", color: "yellow" },
+        { label: "Affiliation", pct: "2.5%", desc: "Flux vers les parrains éligibles", color: "purple" }
+      ]
+    };
   } else if (name.toLowerCase().includes("dn404") || symbol.toLowerCase().includes("404")) {
     ecosystemType = "Zyora DN404 Hybrid (ERC-20 + 10,000 NFT Mirror Collection)";
     feeMechanism = "1.00% Protocol Fee + 7% NFT Royalties + 5% Systematic Buyback & Burn";
     isZyora = true;
     isZyoraDN404 = true;
-  } else if (burnPct >= 1.0) {
-    ecosystemType = "Arc Deflationary Autonomous Asset (Irreversible Dead Burns)";
-    feeMechanism = "Automated Transaction Buyback & Dead Wallet Incineration";
+    flowchart = {
+      protocolTitle: "Zyora DN404 Collection Launcher",
+      feeRate: "1.00% + 7% Royalties",
+      legAsset: "Native USDC Leg",
+      streams: [
+        { label: "Créateur Token / NFT", pct: "65.0%", desc: "Frais de swap + 7% royalties NFT", color: "emerald" },
+        { label: "Trésorerie Zyora", pct: "20.0%", desc: "Infrastructure DN404", color: "cyan" },
+        { label: "🔥 Buyback & Burn", pct: "5.0%", desc: "Rachat automatique de $ZYORA", color: "orange" },
+        { label: "Rewards Pot", pct: "7.5%", desc: "Missions & Airdrop ZYRALS", color: "yellow" },
+        { label: "Affiliation", pct: "2.5%", desc: "Parrainage créateurs", color: "purple" }
+      ]
+    };
+  } else if (symbol === "ARGUS" || addr.includes("ece5ca")) {
+    ecosystemType = "ArgusPad Autonomous Burn Flywheel (AMM Hooks)";
+    feeMechanism = "1.00% Protocol Fee · 50% Buyback & Dead Burn · 25% Holders Payback · 15% SuperLotto · 10% Team";
+    flowchart = {
+      protocolTitle: "ArgusPad AMM Hooks Engine",
+      feeRate: "1.00%",
+      legAsset: "Arc L1 Native USDC",
+      streams: [
+        { label: "🔥 Buyback & Burn", pct: "50.0%", desc: "Incinération permanente 0x00...dEaD", color: "orange" },
+        { label: "💰 Holders Payback", pct: "25.0%", desc: "Redistribution directe aux holders", color: "emerald" },
+        { label: "🎰 SuperLotto", pct: "15.0%", desc: "Cagnotte de tirage communautaire", color: "yellow" },
+        { label: "👥 Team & Ops", pct: "10.0%", desc: "Maintenance des Hooks & Développement", color: "purple" }
+      ]
+    };
+  } else if (symbol === "TOLLY" || addr.includes("bc43ce") || addr.includes("6002ae")) {
+    ecosystemType = "Tolly Protocol (Locked Liquidity & Terminal Leader)";
+    feeMechanism = "1.00% Protocol Fee · 40% Buyback & Burn · 35% Holders Yield · 15% Terminal Rewards · 10% Infra";
+    flowchart = {
+      protocolTitle: "Tolly Terminal & Engine",
+      feeRate: "1.00%",
+      legAsset: "Arc L1 Native USDC",
+      streams: [
+        { label: "🔥 Buyback & Burn", pct: "40.0%", desc: "Achat continu et incinération de $TOLLY", color: "orange" },
+        { label: "💰 Holders Yield", pct: "35.0%", desc: "Rendement passif aux détenteurs", color: "emerald" },
+        { label: "⚡ Terminal Rewards", pct: "15.0%", desc: "Incitations aux utilisateurs actifs", color: "yellow" },
+        { label: "👥 Team & Nodes", pct: "10.0%", desc: "Infrastructure de nœuds Arc", color: "purple" }
+      ]
+    };
+  } else if (tokenData.feeDistribution) {
+    const fd = tokenData.feeDistribution;
+    ecosystemType = `${symbol} Custom Flywheel Asset`;
+    feeMechanism = `${tokenData.feeRatePct || 1}% Protocol Fee avec distribution personnalisée`;
+    const dynamicStreams = [];
+    if (fd.burnPct) dynamicStreams.push({ label: "🔥 Buyback & Burn", pct: `${fd.burnPct}%`, desc: "Incinération Dead Wallet", color: "orange" });
+    if (fd.holdersPct) dynamicStreams.push({ label: "💰 Holders Payback", pct: `${fd.holdersPct}%`, desc: "Redistribution holders", color: "emerald" });
+    if (fd.rewardsPct) dynamicStreams.push({ label: "🏆 Rewards Pot", pct: `${fd.rewardsPct}%`, desc: "Programme d'incitation", color: "yellow" });
+    if (fd.teamPct) dynamicStreams.push({ label: "👥 Team & Ops", pct: `${fd.teamPct}%`, desc: "Développement & Croissance", color: "purple" });
+    if (dynamicStreams.length === 0) {
+      dynamicStreams.push({ label: "💧 Liquidity Pool", pct: "100%", desc: "Frais réinjectés dans la liquidité", color: "cyan" });
+    }
+    flowchart = {
+      protocolTitle: `${symbol} Autonomous Engine`,
+      feeRate: `${tokenData.feeRatePct || 1.00}%`,
+      legAsset: "Native USDC / Arc AMM",
+      streams: dynamicStreams
+    };
+  } else {
+    // Pure Standard AMM Token
+    ecosystemType = "Arc Standard AMM Pair (Clean Fair-Launch)";
+    feeMechanism = "0.30% standard swap fee aux Liquidity Providers (0% Taxe Cachée)";
+    flowchart = {
+      protocolTitle: "Arc Decentralized AMM",
+      feeRate: "0.30%",
+      legAsset: "USDC / ARC Pool Leg",
+      streams: [
+        { label: "💧 Liquidity Providers", pct: "100%", desc: "Rémunération complète des fournisseurs de liquidité", color: "emerald" },
+        { label: "🛡️ Taxe Développeur", pct: "0.0%", desc: "Aucun prélèvement abusif (0% Transfer Tax)", color: "cyan" },
+        { label: "🔥 Dead Wallet Burns", pct: burnPct > 0 ? `${burnPct.toFixed(2)}%` : "0%", desc: burnPct > 0 ? "Tokens envoyés directement au dead address" : "Pas de burn systématique", color: "orange" }
+      ]
+    };
   }
 
   // 2. Score Component 1: Liquidity Health & Depth (Max 25 pts)
@@ -258,6 +341,7 @@ Le token $${symbol} (${name}) opère sur le réseau Arc L1 (Chain ID 5042) avec 
     isZyoraDN404,
     totalScore,
     tier,
+    flowchart,
     breakdown: {
       liquidity: { score: liquidityScore, max: 25, label: "Santé & Profondeur Liquidité", comment: liquidityComment },
       burn: { score: burnScore, max: 20, label: "Dynamique de Burn Déflationniste", comment: burnComment },
