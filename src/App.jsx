@@ -22,6 +22,7 @@ import { AllTokensHub } from "./pages/AllTokensHub";
 import { TokenAuditView } from "./components/TokenAuditView";
 import { TopRevenuePage } from "./pages/TopRevenuePage";
 import { AnomalyRadarPage } from "./pages/AnomalyRadarPage";
+import { AlphaMoneyPage } from "./pages/AlphaMoneyPage";
 
 export default function App() {
   const [tokens, setTokens] = useState(() => {
@@ -232,6 +233,19 @@ export default function App() {
               setActiveToken(t);
             }}
             onNavigate={setCurrentPage}
+          />
+        );
+      case "alpha":
+      case "alpha-hub":
+      case "money":
+      case "cash-hub":
+        return (
+          <AlphaMoneyPage
+            onSelectToken={(t) => {
+              setActiveToken(t);
+            }}
+            onNavigate={setCurrentPage}
+            onOpenSwapModal={() => setIsSwapModalOpen(true)}
           />
         );
       default:

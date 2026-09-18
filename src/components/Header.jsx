@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Zap, Flame, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check, Clock, Sparkles, Trophy, AlertTriangle } from "lucide-react";
+import { Zap, Flame, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check, Clock, Sparkles, Trophy, AlertTriangle, DollarSign } from "lucide-react";
 
 export function Header({
   activeToken,
@@ -196,6 +196,20 @@ export function Header({
               <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
               <span>Anomalies Radar</span>
               <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+            </button>
+
+            <button
+              onClick={() => onNavigate("alpha")}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-medium transition cursor-pointer ${
+                currentPage === "alpha" || currentPage === "alpha-hub" || currentPage === "money"
+                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold shadow-lg shadow-amber-500/15"
+                  : "text-slate-300 hover:text-amber-300"
+              }`}
+              title="Arc L1 Alpha Cash Hub: Arbitrage, Buyback Predictor, Smart Money, and Hyper LP Yield"
+            >
+              <DollarSign className="w-3.5 h-3.5 text-amber-400" />
+              <span className="font-bold text-amber-300">Alpha Hub</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
             </button>
 
             {/* Platform Dropdown */}
@@ -421,6 +435,16 @@ export function Header({
           >
             <AlertTriangle className="w-4 h-4 text-rose-400" />
             <span>⚡ Anomalies & Threat Radar</span>
+          </button>
+          <button
+            onClick={() => {
+              onNavigate("alpha");
+              setMobileMenuOpen(false);
+            }}
+            className="flex items-center gap-2 w-full text-left py-1.5 text-amber-400 font-bold"
+          >
+            <DollarSign className="w-4 h-4 text-amber-400" />
+            <span>💰 Alpha Cash Hub (Arbitrage & Whales)</span>
           </button>
           <div className="pt-2 border-t border-slate-800/60 text-xs font-bold text-slate-500 uppercase">Platform</div>
           <button
