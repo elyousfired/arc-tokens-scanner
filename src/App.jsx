@@ -21,6 +21,7 @@ import { AboutPage } from "./pages/AboutPage";
 import { AllTokensHub } from "./pages/AllTokensHub";
 import { TokenAuditView } from "./components/TokenAuditView";
 import { TopRevenuePage } from "./pages/TopRevenuePage";
+import { AnomalyRadarPage } from "./pages/AnomalyRadarPage";
 
 export default function App() {
   const [tokens, setTokens] = useState(() => {
@@ -217,6 +218,18 @@ export default function App() {
             onSelectToken={(t) => {
               setActiveToken(t);
               setCurrentPage("overview");
+            }}
+            onNavigate={setCurrentPage}
+          />
+        );
+      case "anomalies":
+      case "anomaly-radar":
+      case "threats":
+      case "radar":
+        return (
+          <AnomalyRadarPage
+            onSelectToken={(t) => {
+              setActiveToken(t);
             }}
             onNavigate={setCurrentPage}
           />

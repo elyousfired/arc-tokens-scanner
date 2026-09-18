@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Zap, Flame, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check, Clock, Sparkles, Trophy } from "lucide-react";
+import { Zap, Flame, RefreshCw, ArrowUpRight, ChevronDown, Menu, X, PlusCircle, Check, Clock, Sparkles, Trophy, AlertTriangle } from "lucide-react";
 
 export function Header({
   activeToken,
@@ -182,6 +182,20 @@ export function Header({
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
               <span>Top 100 Revenue</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            </button>
+
+            <button
+              onClick={() => onNavigate("anomalies")}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-medium transition cursor-pointer ${
+                currentPage === "anomalies" || currentPage === "anomaly-radar"
+                  ? "bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold shadow-lg shadow-rose-500/10"
+                  : "text-slate-300 hover:text-white"
+              }`}
+              title="Arc L1 Real-Time On-Chain Anomaly & Threat Detection Radar"
+            >
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+              <span>Anomalies Radar</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
             </button>
 
             {/* Platform Dropdown */}
@@ -397,6 +411,16 @@ export function Header({
           >
             <Trophy className="w-4 h-4 text-amber-400" />
             <span>Top 100 Revenue Leaderboard</span>
+          </button>
+          <button
+            onClick={() => {
+              onNavigate("anomalies");
+              setMobileMenuOpen(false);
+            }}
+            className="flex items-center gap-2 w-full text-left py-1.5 text-rose-400 font-bold"
+          >
+            <AlertTriangle className="w-4 h-4 text-rose-400" />
+            <span>⚡ Anomalies & Threat Radar</span>
           </button>
           <div className="pt-2 border-t border-slate-800/60 text-xs font-bold text-slate-500 uppercase">Platform</div>
           <button
