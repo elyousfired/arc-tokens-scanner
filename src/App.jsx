@@ -20,6 +20,7 @@ import { PlatformPage } from "./pages/PlatformPage";
 import { AboutPage } from "./pages/AboutPage";
 import { AllTokensHub } from "./pages/AllTokensHub";
 import { TokenAuditView } from "./components/TokenAuditView";
+import { TopRevenuePage } from "./pages/TopRevenuePage";
 
 export default function App() {
   const [tokens, setTokens] = useState(() => {
@@ -204,6 +205,18 @@ export default function App() {
             allTokens={tokens}
             onSelectToken={(t) => {
               setActiveToken(t);
+            }}
+            onNavigate={setCurrentPage}
+          />
+        );
+      case "top-revenue":
+      case "revenue":
+      case "revenue-radar":
+        return (
+          <TopRevenuePage
+            onSelectToken={(t) => {
+              setActiveToken(t);
+              setCurrentPage("overview");
             }}
             onNavigate={setCurrentPage}
           />
